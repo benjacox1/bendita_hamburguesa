@@ -25,6 +25,14 @@ const PORT = cliPortArg ? Number(cliPortArg) : (process.env.PORT || 4000);
 // Base dinámica usada como fallback cuando no se proveen variables MP_BACK_*
 const dynamicBase = `http://localhost:${PORT}`;
 
+// Admin auth: token simple para proteger endpoints sensibles
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'bh-admin-2025';
+function requireAdmin(req, res, next){
+  const auth = req.headers['authorization'] || '';
+  if (auth === `Bearer ${ADMIN_TOKEN}`) return next();
+  return res.status(401).json({ error: 'Unauthorized' });
+}
+
 // Helper lectura/escritura
 async function readJSON(file) {
   const txt = await fs.readFile(file, 'utf8');
@@ -58,7 +66,8 @@ app.get('/api/products/:id', async (req, res) => {
 });
 
 // POST nuevo producto
-app.post('/api/products', async (req, res) => {
+// Admin: crear producto
+app.post('/api/products', requireAdmin, async (req, res) => {
   try {
     const { id, nombre, descripcion, precio, categoria, imagen, stock } = req.body;
     if (!nombre || !precio) return res.status(400).json({ error: 'nombre y precio son obligatorios' });
@@ -84,7 +93,8 @@ app.post('/api/products', async (req, res) => {
 });
 
 // PUT actualizar producto
-app.put('/api/products/:id', async (req, res) => {
+// Admin: actualizar producto
+app.put('/api/products/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const products = await readJSON(PRODUCTS_FILE);
@@ -103,7 +113,8 @@ app.put('/api/products/:id', async (req, res) => {
 });
 
 // DELETE producto
-app.delete('/api/products/:id', async (req, res) => {
+// Admin: eliminar producto
+app.delete('/api/products/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     let products = await readJSON(PRODUCTS_FILE);
@@ -118,7 +129,8 @@ app.delete('/api/products/:id', async (req, res) => {
 });
 
 // GET pedidos
-app.get('/api/orders', async (req, res) => {
+// Admin: ver pedidos
+app.get('/api/orders', requireAdmin, async (req, res) => {
   try {
     const orders = await readJSON(ORDERS_FILE);
     res.json(orders);
@@ -128,7 +140,8 @@ app.get('/api/orders', async (req, res) => {
 });
 
 // GET pedido individual
-app.get('/api/orders/:id', async (req, res) => {
+// Admin: ver pedido individual
+app.get('/api/orders/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const orders = await readJSON(ORDERS_FILE);
@@ -198,7 +211,8 @@ app.post('/api/orders', async (req, res) => {
 });
 
 // PATCH cambiar estado pedido
-app.patch('/api/orders/:id/state', async (req, res) => {
+// Admin: cambiar estado de pedido
+app.patch('/api/orders/:id/state', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { estado } = req.body;
@@ -219,7 +233,8 @@ app.patch('/api/orders/:id/state', async (req, res) => {
 });
 
 // DELETE pedido
-app.delete('/api/orders/:id', async (req, res) => {
+// Admin: eliminar pedido
+app.delete('/api/orders/:id', requireAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     let orders = await readJSON(ORDERS_FILE);

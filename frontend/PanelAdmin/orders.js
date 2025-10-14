@@ -22,7 +22,7 @@ const etiquetasEstado = {
 
 async function cargarPedidos(){
   try {
-    const r = await fetch(API_BASE + '/orders', { cache:'no-store' });
+  const r = await fetch(API_BASE + '/orders', { cache:'no-store', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
     if(!r.ok) throw new Error('HTTP '+r.status);
     pedidos = await r.json();
   } catch(e){
@@ -43,7 +43,7 @@ async function crearPedidoManual(data){
     items: [{ productId: data.productId, cantidad: data.cantidad || 1 }]
   };
   const r = await fetch(API_BASE + '/orders', {
-    method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+    method:'POST', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify(body)
   });
   if(!r.ok){
     const err = await r.json().catch(()=>({error:'Error'}));
@@ -56,7 +56,7 @@ async function crearPedidoManual(data){
 
 async function cambiarEstado(id, nuevo){
   const r = await fetch(`${API_BASE}/orders/${id}/state`, {
-    method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ estado: nuevo })
+    method:'PATCH', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify({ estado: nuevo })
   });
   if(!r.ok){ alert('Error cambiando estado'); return; }
   await cargarPedidos();
@@ -65,7 +65,7 @@ async function cambiarEstado(id, nuevo){
 
 async function eliminarPedido(id){
   if(!confirm('Eliminar pedido?')) return;
-  const r = await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE' });
+  const r = await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
   if(!r.ok){ alert('Error eliminando'); return; }
   await cargarPedidos();
   renderPedidos();
@@ -154,7 +154,7 @@ if (btnLimpiarPedidos) {
     if(!confirm('Eliminar TODOS los pedidos?')) return;
     // Eliminar uno por uno (sencillo); para optimizar crear endpoint bulk
     for(const p of pedidos){
-      await fetch(`${API_BASE}/orders/${p.id}`, { method:'DELETE' });
+  await fetch(`${API_BASE}/orders/${p.id}`, { method:'DELETE', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
     }
     await cargarPedidos();
     renderPedidos();
@@ -193,12 +193,12 @@ if (debugTest) debugTest.addEventListener('click', async () => {
   // Crear pedido de prueba (requiere productId real; tomamos el primero disponible)
   let firstProductId = null;
   try {
-    const prods = await fetch(API_BASE + '/products').then(r=>r.json()).catch(()=>[]);
+  const prods = await fetch(API_BASE + '/products', { headers: { ...(window.getAdminAuthHeaders?.()||{}) } }).then(r=>r.json()).catch(()=>[]);
     if(prods.length) firstProductId = prods[0].id;
   } catch{}
   if(!firstProductId){ alert('No hay productos para generar pedido de prueba'); return; }
   const body = { cliente: 'Test '+new Date().toLocaleTimeString(), items:[{ productId:firstProductId, cantidad:1 }]};
-  const r = await fetch(API_BASE + '/orders', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const r = await fetch(API_BASE + '/orders', { method:'POST', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify(body) });
   if(!r.ok){ alert('Error creando pedido test'); return; }
   await cargarPedidos();
   renderPedidos();
@@ -208,7 +208,7 @@ if (debugTest) debugTest.addEventListener('click', async () => {
 if (debugDelTest) debugDelTest.addEventListener('click', async () => {
   // Borrar pedidos cuyo cliente empiece con 'Test '
   const testIds = pedidos.filter(p => /^Test /.test(p.cliente||'')).map(p=>p.id);
-  for(const id of testIds){ await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE' }); }
+  for(const id of testIds){ await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE', headers: { ...(window.getAdminAuthHeaders?.()||{}) } }); }
   await cargarPedidos();
   renderPedidos();
   toggleDebug(true);

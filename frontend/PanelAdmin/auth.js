@@ -37,8 +37,10 @@
 
     if(user === FIXED_USER && pass === FIXED_PASS){
       const exp = addMinutes(nowTs(), EXP_MINUTES);
+      // Token para backend: usar fijo compatible con server.js (ADMIN_TOKEN)
+      const apiToken = 'bh-admin-2025';
       const token = btoa(`${user}:${exp}`);
-      setSession({ user, token, exp });
+      setSession({ user, token, apiToken, exp });
       return { ok: true };
     }
     return { ok: false, error: 'Usuario o contraseña incorrectos' };
@@ -54,4 +56,10 @@
   window.adminLogin = adminLogin;
   window.adminLogout = adminLogout;
   window.getAdminSession = getSession;
+  window.getAdminAuthHeaders = function(){
+    const s = getSession();
+    const headers = {};
+    if (s?.apiToken) headers['Authorization'] = `Bearer ${s.apiToken}`;
+    return headers;
+  };
 })();

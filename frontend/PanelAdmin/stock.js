@@ -12,7 +12,7 @@ if(btnSyncCatalog){ btnSyncCatalog.style.display='none'; }
 
 async function cargarProductos(){
   try {
-    const r = await fetch(API_BASE + '/products', { cache:'no-store' });
+  const r = await fetch(API_BASE + '/products', { cache:'no-store', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
     if(!r.ok) throw new Error('HTTP '+r.status);
     productos = await r.json();
   } catch(e){
@@ -23,16 +23,16 @@ async function cargarProductos(){
 
 async function crearProducto(data){
   const body = { nombre: data.nombre, categoria: data.categoria, precio: parseFloat(data.precio||'0'), stock: parseInt(data.stock||'0'), descripcion: '', imagen: '' };
-  const r = await fetch(API_BASE + '/products', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  const r = await fetch(API_BASE + '/products', { method:'POST', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify(body) });
   if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Error creando producto: '+err.error); }
 }
 async function actualizarProducto(id, patch){
-  const r = await fetch(`${API_BASE}/products/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(patch) });
+  const r = await fetch(`${API_BASE}/products/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify(patch) });
   if(!r.ok){ alert('Error actualizando producto'); }
 }
 async function eliminarProducto(id){
   if(!confirm('¿Eliminar producto?')) return;
-  const r = await fetch(`${API_BASE}/products/${id}`, { method:'DELETE' });
+  const r = await fetch(`${API_BASE}/products/${id}`, { method:'DELETE', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
   if(!r.ok){ alert('Error eliminando'); return; }
   await cargarProductos();
   renderProductos();
@@ -121,7 +121,7 @@ if(btnLimpiarStock){
     if(!confirm('¿Eliminar todos los productos?')) return;
     // eliminar secuencial (simple)
     for(const p of productos){
-      await fetch(`${API_BASE}/products/${p.id}`, { method:'DELETE' });
+  await fetch(`${API_BASE}/products/${p.id}`, { method:'DELETE', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
     }
     await cargarProductos();
     renderProductos();
