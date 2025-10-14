@@ -18,6 +18,27 @@
   status = 200
   force = true
 
+# Normalize admin routes and redirect to login when hitting folder
+[[redirects]]
+  from = "/paneladmin"
+  to = "/PanelAdmin/login.html"
+  status = 301
+
+[[redirects]]
+  from = "/paneladmin/"
+  to = "/PanelAdmin/login.html"
+  status = 301
+
+[[redirects]]
+  from = "/paneladmin/*"
+  to = "/PanelAdmin/:splat"
+  status = 301
+
+[[redirects]]
+  from = "/PanelAdmin"
+  to = "/PanelAdmin/login.html"
+  status = 301
+
 # Spa fallback for client-side routing
 [[redirects]]
   from = "/*"
