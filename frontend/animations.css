@@ -306,11 +306,12 @@ input:focus, textarea:focus {
 
 /* ===== DARK MODE SUPPORT ===== */
 @media (prefers-color-scheme: dark) {
+    /* Mantener toast con fondo blanco y texto negro también en modo oscuro */
     .toast {
-        background: #2d2d2d;
-        color: white;
+        background: #ffffff;
+        color: #000000;
     }
-    
+
     .skeleton {
         background: linear-gradient(90deg, #333 25%, #444 50%, #333 75%);
         background-size: 200% 100%;
