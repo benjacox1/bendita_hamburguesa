@@ -100,3 +100,7 @@ temp/
 
 # Local uploads
 uploads/
+
+# Installers (avoid pushing large binaries)
+Git-*.exe
+GitHubDesktopSetup-*.exe
