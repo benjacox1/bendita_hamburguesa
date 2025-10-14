@@ -48,11 +48,11 @@ class ToastManager {
         };
 
         toast.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; color:#000;">
                 <span style="font-size: 16px;">${icons[type] || icons.info}</span>
-                <span style="flex: 1;">${message}</span>
+                <span style="flex: 1; color:#000;">${message}</span>
                 <button onclick="this.parentElement.parentElement.remove()" 
-                        style="background: none; border: none; font-size: 18px; cursor: pointer; opacity: 0.7;">×</button>
+                        style="background: none; border: none; font-size: 18px; cursor: pointer; opacity: 0.7; color:#000;">×</button>
             </div>
         `;
 

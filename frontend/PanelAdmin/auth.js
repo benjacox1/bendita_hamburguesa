@@ -2,7 +2,7 @@
 // Nota: Esto protege solo a nivel de UI. Para seguridad real, validar en backend.
 
 (function(){
-  const KEY = 'admin_session_v1';
+  const KEY = 'admin_session_v2';
   const EXP_MINUTES = 8 * 60; // 8 horas
 
   function nowTs(){ return Date.now(); }

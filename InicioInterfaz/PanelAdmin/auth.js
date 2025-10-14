@@ -1,6 +1,6 @@
 // Copia de autenticación para InicioInterfaz/PanelAdmin
 (function(){
-  const KEY = 'admin_session_v1';
+  const KEY = 'admin_session_v2';
   const EXP_MINUTES = 8 * 60;
   function nowTs(){ return Date.now(); }
   function addMinutes(ms, mins){ return ms + mins*60*1000; }
