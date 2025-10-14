@@ -1,0 +1,25 @@
+body { margin:0; font-family:system-ui, Arial, sans-serif; background:#f5f7fa; color:#1f2937; }
+.topbar { display:flex; gap:1rem; align-items:center; padding:.75rem 1rem; background:#111827; color:#fff; }
+.topbar h1 { font-size:1.1rem; margin:0; }
+.back { color:#93c5fd; text-decoration:none; font-size:.85rem; }
+.back:hover { text-decoration:underline; }
+.container { max-width:1000px; margin:0 auto; padding:1.25rem; }
+.msg { text-align:center; padding:2rem 1rem; color:#6b7280; }
+.producto { display:grid; gap:2rem; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); background:#fff; padding:1.25rem 1.5rem; border-radius:14px; box-shadow:0 4px 10px rgba(0,0,0,.05); animation:fade .25s ease; }
+.media img { width:100%; border-radius:12px; background:#e5e7eb; object-fit:cover; aspect-ratio:4/3; }
+.info h2 { margin-top:0; margin-bottom:.5rem; font-size:1.6rem; }
+.desc { line-height:1.4; font-size:.9rem; }
+.precio { font-size:1.3rem; font-weight:700; color:#2563eb; }
+.categoria { font-size:.7rem; text-transform:uppercase; letter-spacing:1px; color:#6b7280; margin-top:-.3rem; margin-bottom:1rem; }
+.pedido-box { display:flex; flex-direction:column; gap:.65rem; background:#f9fafb; padding:1rem; border:1px solid #e5e7eb; border-radius:10px; }
+.pedido-box h3 { margin:0 0 .25rem 0; font-size:1rem; }
+.pedido-box label { display:flex; flex-direction:column; font-size:.7rem; text-transform:uppercase; font-weight:600; color:#374151; gap:.25rem; }
+.pedido-box input, .pedido-box textarea { font-family:inherit; padding:.55rem .6rem; border:1px solid #d1d5db; border-radius:8px; background:#fff; font-size:.85rem; }
+.pedido-box textarea { resize:vertical; }
+.pedido-box input:focus, .pedido-box textarea:focus { outline:2px solid #2563eb33; border-color:#2563eb; }
+button.primary { background:#2563eb; color:#fff; border:none; padding:.7rem 1rem; border-radius:8px; font-weight:600; cursor:pointer; font-size:.85rem; }
+button.primary:hover { background:#1d4ed8; }
+.mini { font-size:.7rem; color:#166534; min-height:1em; }
+.error { color:#b91c1c; }
+@keyframes fade { from { opacity:0; translate:0 4px; } to { opacity:1; translate:0 0; } }
+@media (max-width:600px){ .producto { gap:1rem; } }

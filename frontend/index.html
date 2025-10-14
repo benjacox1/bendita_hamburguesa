@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bendita Hamburguesa - Mejores Hamburguesas Online</title>
+  <meta name="description" content="Las mejores hamburguesas artesanales con delivery. Pide online y paga con MercadoPago de forma segura.">
+  
+  <!-- Estilos -->
+  <link rel="stylesheet" href="main.css" />
+  <link rel="stylesheet" href="animations.css" />
+  <link rel="stylesheet" href="mejoras-visuales.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Bendita Hamburguesa</h1>
+    <nav class="nav-links">
+      <a href="PanelAdmin/index.html">Panel Admin</a>
+      <a href="#" id="btn-scroll-productos">Productos</a>
+      <a href="Carrito de compras/carrito.html" class="cart-btn" id="btn-cart" aria-label="Ir al carrito">
+        <span class="cart-icon" aria-hidden="true">🛒</span>
+        <span class="cart-text">Carrito</span>
+        <span class="cart-count" id="cart-count">0</span>
+      </a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <h2>Hamburguesas,bebidas y combos irresistibles</h2>
+      <p>Elegí, personalizá y prepará tu pedido en Bendita Hamburguesa.</p>
+      <a class="hero-btn" href="#listado">Ver Menú</a>
+    </div>
+  </section>
+
+  <section class="filtros" id="filtros">
+    <div class="filtros-row">
+      <input id="buscador" placeholder="Buscar por nombre..." />
+      <select id="categoria">
+        <option value="">Todas las categorías</option>
+      </select>
+      <select id="orden">
+        <option value="">Ordenar</option>
+        <option value="precio-asc">Precio: menor a mayor</option>
+        <option value="precio-desc">Precio: mayor a menor</option>
+        <option value="nombre-asc">Nombre A-Z</option>
+        <option value="nombre-desc">Nombre Z-A</option>
+      </select>
+      <button id="limpiar" class="outline">Limpiar</button>
+    </div>
+  </section>
+
+  <main id="listado" class="grid"></main>
+
+  <a href="Carrito de compras/carrito.html" class="cart-fab" id="cart-fab" aria-label="Ir al carrito">
+    <span class="cart-icon">🛒</span>
+    <strong>Carrito</strong>
+    <span class="cart-count" id="cart-count-fab">0</span>
+  </a>
+
+  <div id="estado" class="estado-carga">Cargando productos...</div>
+
+  <footer class="footer">
+    <small>© <span id="year"></span> Bendita Hamburguesa </small>
+  </footer>
+
+  <template id="tpl-card">
+  <article class="card reveal">
+      <div class="media">
+        <img class="card-img" alt="" loading="lazy" />
+        <span class="badge-cat"></span>
+      </div>
+      <div class="card-body">
+        <h3 class="card-title"></h3>
+        <div class="card-bottom">
+          <span class="precio"></span>
+          <a class="btn-ver" target="_self">Ver</a>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- Scripts de funcionalidad -->
+  <script src="config.js"></script>
+  <script src="notifications.js"></script>
+  <script src="loading.js"></script>
+  <script src="main.js"></script>
+
+  <!-- Mini panel del carrito (popover) -->
+  <div id="cart-mini" class="cart-mini" aria-hidden="true"></div>
+  
+  <!-- Inicializar mejoras -->
+  <script>
+    // Mostrar notificación de bienvenida
+    setTimeout(() => {
+      if (window.showSuccess) {
+        showSuccess('¡Bienvenido a Bendita Hamburguesa! 🍔');
+      }
+    }, 1000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "name": "bendita-hamburguesa-backend",
+  "version": "1.0.0",
+  "description": "Backend simple Express para gestión de productos y pedidos",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "check": "node check.mjs",
+    "optimize-images": "node optimize-images.mjs",
+    "validate-images": "node validate-images.mjs",
+    "migrate-images": "node migrate-images.mjs",
+    "front": "node ../frontend-server.js",
+    "front:watch": "node --watch ../frontend-server.js",
+    "prep:images": "npm run migrate-images && npm run optimize-images && npm run validate-images",
+    "dev:all": "npm run prep:images && node --watch server.js",
+    "payment-check": "node payment-check.mjs",
+    "dev:tunnel": "node tunnel-cloudflared.mjs",
+    "dev:tunnel:auto": "npm run dev:tunnel",
+    "online": "node tunnel-cloudflared.mjs",
+    "start:online": "node tunnel-cloudflared.mjs",
+    "payment:flow": "node payment-flow-verify.mjs",
+    "prices:dry10": "node update-prices.mjs --type percent --value 10 --round nearest100 --dry-run",
+    "prices:up10": "node update-prices.mjs --type percent --value 10 --round nearest100",
+    "prices:add500": "node update-prices.mjs --type add --value 500 --round nearest100"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mercadopago": "^2.0.0",
+    "nanoid": "^5.0.5",
+    "node-fetch": "^3.3.2",
+    "sharp": "^0.33.3"
+  }
+}

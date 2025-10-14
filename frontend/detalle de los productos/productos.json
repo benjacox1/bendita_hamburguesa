@@ -1,0 +1,66 @@
+[
+  {
+    "id": "hamburguesa-simple",
+    "nombre": "Hamburguesa Simple",
+    "descripcion": "Pan suave, carne 100% res, queso, lechuga y tomate fresco.",
+    "precio": 1500,
+    "categoria": "comida",
+  "imagen": "IMAGENES COMIDA/2 HAMBURGUESAS DOBLES.png"
+  },
+  {
+    "id": "hamburguesa-doble",
+    "nombre": "Hamburguesa Doble",
+    "descripcion": "Doble carne, doble queso, vegetales frescos y salsa especial.",
+    "precio": 2000,
+    "categoria": "comida",
+    "imagen": "IMAGENES COMIDA/HAMBURGUESA DOBLE.png"
+  },
+  {
+    "id": "lata-pepsi",
+    "nombre": "Lata de Pepsi",
+    "descripcion": "Refresco cola bien frío 354ml.",
+    "precio": 1200,
+    "categoria": "bebida",
+    "imagen": "IMAGENES COMIDA/LATA DE PEPSI.png"
+  },
+  {
+    "id": "combo-simple-pepsi",
+    "nombre": "Combo Hamburguesa Simple + Pepsi",
+    "descripcion": "Hamburguesa simple + lata de Pepsi a precio especial.",
+    "precio": 2000,
+    "categoria": "combo",
+    "imagen": "IMAGENES COMIDA/HAMBURGUESA SIMPLE + LATA DE PEPSI.png"
+  },
+  {
+    "id": "combo-doble-pepsi",
+    "nombre": "Combo Hamburguesa Doble + Pepsi",
+    "descripcion": "Hamburguesa doble + lata de Pepsi para grandes apetitos.",
+    "precio": 2800,
+    "categoria": "combo",
+    "imagen": "IMAGENES COMIDA/HAMBURGUESA DOBLE + LATA DE PEPSI.png"
+  },
+  {
+    "id": "pack-2-simples",
+    "nombre": "Pack 2 Hamburguesas Simples",
+    "descripcion": "Ideal para compartir: dos hamburguesas simples.",
+    "precio": 2500,
+    "categoria": "promo",
+    "imagen": "IMAGENES COMIDA/2 HAMBURGUESAS SIMPLES.png"
+  },
+  {
+    "id": "pack-2-dobles",
+    "nombre": "Pack 2 Hamburguesas Dobles",
+    "descripcion": "Doble potencia sabor X2.",
+    "precio": 3500,
+    "categoria": "promo",
+    "imagen": "IMAGENES COMIDA/2 HAMBURGUESAS DOBLES.png"
+  },
+  {
+    "id": "pack-2-pepsi",
+    "nombre": "Pack 2 Latas Pepsi",
+    "descripcion": "Doble refresco para acompañar.",
+    "precio": 2000,
+    "categoria": "promo",
+    "imagen": "IMAGENES COMIDA/2 LATAS DE PEPSI.png"
+  }
+]

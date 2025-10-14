@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Producto</title>
+  <link rel="stylesheet" href="producto.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a href="../index.html" class="back">← Volver</a>
+    <h1 id="titulo-prod">Producto</h1>
+  </header>
+
+  <main id="contenedor" class="container">
+    <div id="estado-carga" class="msg">Cargando...</div>
+  </main>
+
+  <template id="tpl-producto">
+    <article class="producto">
+      <div class="media">
+        <img id="prod-imagen" alt="Producto" loading="lazy" />
+      </div>
+      <div class="info">
+        <h2 id="prod-nombre"></h2>
+        <p id="prod-descripcion" class="desc"></p>
+        <p class="precio"><span id="prod-precio"></span></p>
+        <p class="categoria" id="prod-categoria"></p>
+
+        <form id="form-agregar" class="pedido-box">
+          <h3>Agregar al carrito</h3>
+          <label>Cantidad
+            <input type="number" name="cantidad" value="1" min="1" required />
+          </label>
+          <button class="primary" type="submit">Agregar</button>
+          <div class="mini" id="resultado"></div>
+          <p class="mini">Luego podrás pagar todo junto en el carrito.</p>
+          <a class="outline" id="link-carrito" href="../Carrito de compras/carrito.html" style="display:none;margin-top:6px;inline-size:fit-content;">Ir al carrito →</a>
+        </form>
+      </div>
+    </article>
+  </template>
+
+  <script src="../config.js"></script>
+  <script src="producto.js"></script>
+</body>
+</html>

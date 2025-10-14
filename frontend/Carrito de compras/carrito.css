@@ -1,0 +1,47 @@
+/* Tema oscuro moderno, tarjetas y tabla elegante */
+:root{
+	--bg:#0d0f12; --panel:#12161c; --panel-2:#161b22; --border:#1f242d; --muted:#9ca3af; --accent:#ff4d00;
+}
+body{margin:0;background:var(--bg);color:#f5f7fa;font-family:system-ui,Arial,sans-serif}
+.container{max-width:1000px;margin:0 auto;padding:1.25rem}
+.topbar{display:flex;align-items:center;gap:.75rem;background:#111827;color:#fff;padding:.85rem 1rem;border-bottom:1px solid #1f242d}
+.topbar h1{margin:0;font-size:1.1rem}
+.back{color:#ffb087;text-decoration:none}
+.back:hover{text-decoration:underline}
+.msg{background:linear-gradient(var(--panel),var(--panel-2));padding:1rem;border-radius:12px;border:1px solid var(--border);color:#cbd5e1}
+
+.tabla{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:1rem}
+.tabla thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;padding:.4rem .6rem}
+.tabla tbody tr{background:var(--panel);box-shadow:0 6px 22px -12px rgba(0,0,0,.7),0 0 0 1px var(--border)}
+.tabla td{padding:.75rem .7rem;border-bottom:1px solid rgba(255,255,255,.03)}
+.tabla td:last-child{text-align:center}
+.tabla input[type=number]{width:68px;background:#0f1318;border:1px solid #29313b;border-radius:10px;color:#fff;padding:.35rem .4rem}
+.inline-img{width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #29313b;margin-right:.6rem;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.prod-cell{display:flex;align-items:center;gap:.6rem}
+
+.total-box{margin:1rem 0 1.2rem;font-size:1.05rem;background:var(--panel);border:1px solid var(--border);padding:.8rem 1rem;border-radius:12px;display:flex;justify-content:space-between;align-items:center}
+.acciones{display:flex;gap:.75rem;margin-bottom:.75rem}
+button{cursor:pointer;border:1px solid #29313b;background:#1d232e;color:#fff;padding:.65rem 1rem;border-radius:10px;font-size:.85rem;transition:.3s;box-shadow:0 4px 16px -8px rgba(0,0,0,.5)}
+button:hover{transform:translateY(-2px)}
+button.primary{background:var(--accent);border-color:var(--accent);box-shadow:0 10px 28px -12px rgba(255,77,0,.9)}
+button.primary:hover{filter:brightness(1.05)}
+button.outline{background:#0f1318;color:#ffb087}
+button:disabled{opacity:.5;cursor:not-allowed}
+.mini{font-size:.75rem;margin-top:.4rem;color:#9ca3af}
+.success{color:#9ef7c2}
+.error{color:#ffb5b5}
+.warn{color:#f7eaa1}
+
+/* Mini panel (para la página principal, estilos aquí para compartir paleta) */
+.cart-mini{position:fixed;right:16px;bottom:76px;display:none;min-width:260px;max-width:320px;background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:0 14px 44px -14px rgba(0,0,0,.8);z-index:600;overflow:hidden}
+.cart-mini.show{display:block;}
+.cart-mini header{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;border-bottom:1px solid var(--border);}
+.cart-mini header strong{font-size:.85rem}
+.cart-mini header button{background:transparent;border:1px solid #29313b;border-radius:8px;color:#9ca3af;padding:.25rem .45rem}
+.cart-mini .items{max-height:280px;overflow:auto}
+.cart-mini .item{display:flex;gap:.5rem;padding:.55rem .75rem;border-bottom:1px solid rgba(255,255,255,.04)}
+.cart-mini .item:last-child{border-bottom:none}
+.cart-mini .name{font-size:.82rem;color:#e5e7eb}
+.cart-mini .meta{font-size:.72rem;color:#9ca3af}
+.cart-mini .footer{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:#0f1318;border-top:1px solid var(--border)}
+.cart-mini .go{background:var(--accent);border:1px solid var(--accent);color:#fff;padding:.5rem .7rem;border-radius:10px;font-size:.8rem}
