@@ -374,16 +374,132 @@ app.get('/api/version', (req,res)=>{
 // Configuración de pagos (real vs simulado)
 app.get('/api/payments/config', (req, res) => {
   const hasToken = !!process.env.MP_ACCESS_TOKEN;
+  const vexorProject = process.env.NEXT_PUBLIC_VEXOR_PROJECT || process.env.VEXOR_PROJECT || null;
+  const vexorPublishable = process.env.NEXT_PUBLIC_VEXOR_PUBLISHABLE_KEY || process.env.VEXOR_PUBLISHABLE_KEY || null;
+  const provider = vexorPublishable ? 'vexor' : (hasToken ? 'mercadopago' : 'simulated');
   res.json({
     mode: hasToken ? 'real' : 'simulated',
+    provider,
     hasToken,
     back_urls: {
       success: process.env.MP_BACK_SUCCESS || `${dynamicBase}/?pago=success`,
       failure: process.env.MP_BACK_FAILURE || `${dynamicBase}/?pago=failure`,
       pending: process.env.MP_BACK_PENDING || `${dynamicBase}/?pago=pending`
     },
-    webhook: process.env.MP_WEBHOOK || null
+    webhook: process.env.MP_WEBHOOK || null,
+    vexor: {
+      project: vexorProject,
+      publishableKeyPresent: !!vexorPublishable
+    }
   });
+});
+
+// ======= Pagos Vexor (SIMULADO/PLUMBING) =======
+// Crea una "sesión" de checkout y devuelve una URL para redirigir.
+// Si VEXOR_SECRET_KEY no está definido, genera una URL simulada.
+app.post('/api/payments/vexor/session', async (req, res) => {
+  try {
+    const { orderId } = req.body || {};
+    if(!orderId) return res.status(400).json({ error: 'orderId requerido' });
+    const orders = await readJSON(ORDERS_FILE);
+    const order = orders.find(o => o.id === orderId);
+    if(!order) return res.status(404).json({ error: 'Pedido no encontrado' });
+    if(!order.items?.length) return res.status(400).json({ error: 'Pedido sin items' });
+    if(!order.importe || order.importe <= 0) return res.status(400).json({ error: 'Importe inválido' });
+
+    const secret = process.env.VEXOR_SECRET_KEY;
+    const project = process.env.NEXT_PUBLIC_VEXOR_PROJECT || process.env.VEXOR_PROJECT || 'project';
+    const publishable = process.env.NEXT_PUBLIC_VEXOR_PUBLISHABLE_KEY || process.env.VEXOR_PUBLISHABLE_KEY || 'pub';
+
+    // Simulación si no hay SECRET: usamos una pantalla local para elegir estado
+    if(!secret){
+      const url = `${dynamicBase}/pago/vexor/${order.id}`;
+      // Marcar como processing
+      order.paymentStatus = 'processing';
+      order.paymentCreated = Date.now();
+      await writeJSON(ORDERS_FILE, orders);
+      return res.json({ checkout_url: url, simulated: true, provider: 'vexor' });
+    }
+
+    // Si hubiera docs oficiales, aquí haríamos fetch a la API real de Vexor.
+    // Dejamos una respuesta 501 para indicar que falta configurar el endpoint real.
+    return res.status(501).json({
+      error: 'Integración Vexor real no configurada',
+      detail: 'Provee VEXOR_API_BASE y documentación del endpoint para crear sesión. Por ahora se usa modo simulado cuando falta VEXOR_SECRET_KEY.',
+      provider: 'vexor'
+    });
+  } catch(e){
+    res.status(500).json({ error: 'Error creando sesión Vexor', detail: e.message });
+  }
+});
+
+// Página de checkout Vexor (simulada) para elegir resultado de pago
+app.get('/pago/vexor/:orderId', async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const orders = await readJSON(ORDERS_FILE);
+    const order = orders.find(o => o.id === orderId);
+    if(!order) return res.status(404).send('Pedido no encontrado');
+    const html = `<!doctype html>
+    <html lang="es"><head><meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pagar con Vexor (Simulado)</title>
+    <style>body{font-family:system-ui,Segoe UI,Arial,sans-serif;background:#0f141a;color:#e6edf3;padding:32px}
+    .card{max-width:640px;margin:24px auto;background:#111821;border:1px solid #1f2a36;border-radius:14px;padding:24px;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    h1{font-size:20px;margin:0 0 10px}
+    .mini{opacity:.8;font-size:14px}
+    .total{font-size:28px;margin:14px 0;color:#8bcf9f}
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    a.btn{padding:10px 14px;border-radius:10px;border:1px solid #2b3a49;text-decoration:none;color:#e6edf3}
+    a.s{background:#14301f;border-color:#1f5131}
+    a.f{background:#341212;border-color:#5a1f1f}
+    a.p{background:#302a14;border-color:#514a1f}
+    </style></head><body>
+    <div class="card">
+      <h1>Checkout Vexor (Simulado)</h1>
+      <div class="mini">Pedido #${order.id}</div>
+      <div class="total">Total: $ ${order.importe.toFixed(2)}</div>
+      <p>Elige el resultado del pago para continuar:</p>
+      <div class="btns">
+        <a class="btn s" href="${dynamicBase}/api/payments/vexor/simulate?orderId=${order.id}&status=approved">Aprobar pago</a>
+        <a class="btn f" href="${dynamicBase}/api/payments/vexor/simulate?orderId=${order.id}&status=rejected">Rechazar pago</a>
+        <a class="btn p" href="${dynamicBase}/api/payments/vexor/simulate?orderId=${order.id}&status=pending">Marcar pendiente</a>
+      </div>
+      <p class="mini">Nota: esta pantalla existe solo para pruebas sin conectar con Vexor real.</p>
+    </div>
+    </body></html>`;
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.send(html);
+  } catch(e){ res.status(500).send('Error construyendo checkout'); }
+});
+
+// Callback simulador: actualiza estado y redirige al sitio con ?pago=
+app.get('/api/payments/vexor/simulate', async (req, res) => {
+  try {
+    const { orderId, status } = req.query;
+    const allowed = ['approved','rejected','pending'];
+    if(!orderId || !allowed.includes(String(status))){
+      return res.status(400).send('Parámetros inválidos');
+    }
+    const orders = await readJSON(ORDERS_FILE);
+    const order = orders.find(o => o.id === String(orderId));
+    if(!order) return res.status(404).send('Pedido no encontrado');
+    const prev = order.paymentStatus;
+    order.paymentStatus = String(status);
+    order.paymentUpdated = Date.now();
+    if(order.paymentStatus === 'approved' && order.estado === 'espera'){
+      order.estado = 'preparando';
+      order.fechaCambio = Date.now();
+    }
+    if(order.paymentStatus === 'rejected'){
+      await reponerStock(order);
+    }
+    await writeJSON(ORDERS_FILE, orders);
+    logApp('vexor.simulated.callback', { orderId: order.id, status: order.paymentStatus, previous: prev });
+    const pago = order.paymentStatus === 'approved' ? 'success' : (order.paymentStatus === 'rejected' ? 'failure' : 'pending');
+    const back = `${dynamicBase}/?pago=${pago}&order_id=${order.id}`;
+    res.redirect(back);
+  } catch(e){ res.status(500).send('Error simulando pago'); }
 });
 
 // ======= Pagos Mercado Pago (PLACEHOLDER) =======

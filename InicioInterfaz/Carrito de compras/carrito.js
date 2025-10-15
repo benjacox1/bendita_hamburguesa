@@ -80,6 +80,19 @@ async function crearPreferencia(orderId){
   return r.json();
 }
 
+async function crearSesionVexor(orderId){
+  const r = await fetch(API_BASE + '/payments/vexor/session', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ orderId })
+  });
+  if(!r.ok){
+    const err = await r.json().catch(()=>({error:'Error'}));
+    throw new Error(err.error || 'Error creando sesión Vexor');
+  }
+  return r.json();
+}
+
 function initEventos(){
   const main = document.getElementById('main');
   main.addEventListener('input', e => {
@@ -138,51 +151,61 @@ function initEventos(){
         return;
       }
       
-      msg.textContent='Generando preferencia de pago...';
-      
-      const pref = await crearPreferencia(pedido.id);
-      console.log('[CHECKOUT] respuesta preferencia', pref);
-      
-      if(!pref || !pref.init_point){
-        msg.textContent='No se recibió URL de pago del backend';
-        msg.classList.add('error');
-        return;
-      }
-      
-      // Verificar datos de la preferencia
-      if (pref.total && Math.abs(pref.total - pedido.importe) > 0.01) {
-        msg.textContent = 'Error: Total de pago incorrecto';
-        msg.classList.add('error');
-        console.error('[CHECKOUT] Payment total mismatch', { preference: pref.total, order: pedido.importe });
-        return;
-      }
-      
-      msg.textContent = `Redirigiendo a pago (${pref.simulated ? 'SIMULADO' : 'REAL'})...`;
-      
-      // Guardar info completa en sessionStorage
-      try {
-        sessionStorage.setItem(SS_LAST_ORDER, JSON.stringify({
-          orderId: pedido.id,
-          external_reference: pref.external_reference,
-          total: pedido.importe,
-          items_count: pedido.items.length,
-          created: Date.now(),
-          simulated: pref.simulated
-        }));
-      } catch {}
-      
-      // Esperar un poco para que el usuario vea el mensaje
-      setTimeout(() => {
-        try {
-          window.location.href = pref.init_point;
-        } catch(navErr){
-          console.error('[CHECKOUT] error navegando a init_point', navErr);
-          msg.textContent='Error navegando a pasarela: '+navErr.message;
+      if (paymentConfig?.provider === 'vexor') {
+        msg.textContent='Creando sesión de pago (Vexor)...';
+        const ses = await crearSesionVexor(pedido.id);
+        console.log('[CHECKOUT] sesión Vexor', ses);
+        if(!ses || !ses.checkout_url){
+          msg.textContent='No se recibió URL de pago Vexor';
           msg.classList.add('error');
+          return;
         }
-      }, 1000);
-      
-      msg.classList.add('success');
+        msg.textContent = `Redirigiendo a pago Vexor (${ses.simulated ? 'SIMULADO' : 'REAL'})...`;
+        try {
+          sessionStorage.setItem(SS_LAST_ORDER, JSON.stringify({
+            orderId: pedido.id,
+            external_reference: 'vexor_'+pedido.id,
+            total: pedido.importe,
+            items_count: pedido.items.length,
+            created: Date.now(),
+            simulated: !!ses.simulated,
+            provider: 'vexor'
+          }));
+        } catch {}
+        setTimeout(()=>{ window.location.href = ses.checkout_url; }, 800);
+        msg.classList.add('success');
+        return;
+      } else {
+        msg.textContent='Generando preferencia de pago...';
+        const pref = await crearPreferencia(pedido.id);
+        console.log('[CHECKOUT] respuesta preferencia', pref);
+        if(!pref || !pref.init_point){
+          msg.textContent='No se recibió URL de pago del backend';
+          msg.classList.add('error');
+          return;
+        }
+        // Verificar datos de la preferencia
+        if (pref.total && Math.abs(pref.total - pedido.importe) > 0.01) {
+          msg.textContent = 'Error: Total de pago incorrecto';
+          msg.classList.add('error');
+          console.error('[CHECKOUT] Payment total mismatch', { preference: pref.total, order: pedido.importe });
+          return;
+        }
+        msg.textContent = `Redirigiendo a pago (${pref.simulated ? 'SIMULADO' : 'REAL'})...`;
+        try {
+          sessionStorage.setItem(SS_LAST_ORDER, JSON.stringify({
+            orderId: pedido.id,
+            external_reference: pref.external_reference,
+            total: pedido.importe,
+            items_count: pedido.items.length,
+            created: Date.now(),
+            simulated: pref.simulated,
+            provider: 'mercadopago'
+          }));
+        } catch {}
+        setTimeout(()=>{ window.location.href = pref.init_point; }, 800);
+        msg.classList.add('success');
+      }
       
     } catch(e){
       console.error('[CHECKOUT] Error:', e);
@@ -259,7 +282,10 @@ async function init(){
       const msg = document.getElementById('checkout-msg');
       
       if (!isPaymentReturn) {
-        if(paymentConfig.mode === 'real'){
+        if (paymentConfig.provider === 'vexor') {
+          msg.textContent = paymentConfig.vexor?.publishableKeyPresent ? 'Vexor activado' : 'Vexor en modo simulado (falta clave secreta)';
+          msg.classList.add(paymentConfig.vexor?.publishableKeyPresent ? 'success' : 'error');
+        } else if(paymentConfig.mode === 'real'){
           msg.textContent = 'Modo pago REAL activado - MercadoPago configurado';
           msg.classList.add('success');
         } else {
