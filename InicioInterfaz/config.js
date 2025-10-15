@@ -10,11 +10,20 @@
   function readBackendJson(){
     try {
       const xhr = new XMLHttpRequest();
-      xhr.open('GET', 'backend.json', false);
-      xhr.send(null);
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const obj = JSON.parse(xhr.responseText||'{}');
-        if (obj && obj.backend && /^https?:\/\//i.test(obj.backend)) return obj.backend;
+      // intentar desde raíz y relativo
+      const cand = [
+        '/backend.json',
+        'backend.json'
+      ];
+      for (const url of cand){
+        try {
+          xhr.open('GET', url, false);
+          xhr.send(null);
+          if (xhr.status >= 200 && xhr.status < 300) {
+            const obj = JSON.parse(xhr.responseText||'{}');
+            if (obj && obj.backend && /^https?:\/\//i.test(obj.backend)) return obj.backend;
+          }
+        } catch {}
       }
     } catch {}
     return '';
