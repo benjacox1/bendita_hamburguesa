@@ -15,12 +15,11 @@
   function clearSession(){ localStorage.removeItem(KEY); }
 
   function isValidSession(sess){
-    if(!sess || !sess.user || !sess.token || !sess.exp) return false;
+    if(!sess || !sess.apiToken || !sess.exp) return false;
     return nowTs() < sess.exp;
   }
 
   function redirectToLogin(){
-    // Mantener ruta del panel por si se quiere volver post-login
     const target = location.pathname.replace(/[^/]*$/, '') + 'login.html';
     location.replace(target + '?next=' + encodeURIComponent(location.href));
   }
@@ -30,20 +29,16 @@
     if(!isValidSession(s)) redirectToLogin();
   }
 
+  // Login sin hardcodear usuario/contraseña: la "contraseña" se usa como token de acceso (ADMIN_TOKEN)
   function adminLogin(user, pass){
-    // Credenciales fijas (modificar aquí)
-    const FIXED_USER = 'benja1906';
-    const FIXED_PASS = '1595';
-
-    if(user === FIXED_USER && pass === FIXED_PASS){
-      const exp = addMinutes(nowTs(), EXP_MINUTES);
-      // Token para backend: usar fijo compatible con server.js (ADMIN_TOKEN)
-      const apiToken = 'bh-admin-2025';
-      const token = btoa(`${user}:${exp}`);
-      setSession({ user, token, apiToken, exp });
-      return { ok: true };
+    const accessToken = (pass || '').trim();
+    if(!accessToken){
+      return { ok: false, error: 'Ingrese su clave de acceso' };
     }
-    return { ok: false, error: 'Usuario o contraseña incorrectos' };
+    const exp = addMinutes(nowTs(), EXP_MINUTES);
+    const token = btoa(`${user || 'admin'}:${exp}`);
+    setSession({ user: user || 'admin', token, apiToken: accessToken, exp });
+    return { ok: true };
   }
 
   function adminLogout(){

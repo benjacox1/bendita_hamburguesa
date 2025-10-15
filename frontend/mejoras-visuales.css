@@ -86,6 +86,13 @@
   }
 }
 
+/* Solo el toast de bienvenida con texto negro para máxima legibilidad */
+.toast.toast-welcome,
+.toast.toast-welcome *,
+.toast.toast-welcome button {
+  color: #000 !important;
+}
+
 /* ===== BADGE DE PRECIO ===== */
 .precio-badge {
   display: inline-block;

@@ -13,7 +13,15 @@
     location.replace(target + '?next=' + encodeURIComponent(location.href));
   }
   function requireAuth(){ const s = getSession(); if(!isValidSession(s)) redirectToLogin(); }
-  function adminLogin(user, pass){ const FIXED_USER='benja1906'; const FIXED_PASS='1595'; if(user===FIXED_USER && pass===FIXED_PASS){ const exp=addMinutes(nowTs(), EXP_MINUTES); const apiToken='bh-admin-2025'; const token=btoa(`${user}:${exp}`); setSession({user, token, apiToken, exp}); return {ok:true}; } return {ok:false, error:'Usuario o contraseña incorrectos'}; }
+  // Uso de token en lugar de credenciales fijas: el campo "contraseña" se toma como token de acceso
+  function adminLogin(user, pass){
+    const accessToken = (pass || '').trim();
+    if(!accessToken){ return { ok:false, error:'Ingrese su clave de acceso' }; }
+    const exp=addMinutes(nowTs(), EXP_MINUTES);
+    const token=btoa(`${user||'admin'}:${exp}`);
+    setSession({user: user||'admin', token, apiToken: accessToken, exp});
+    return {ok:true};
+  }
   function adminLogout(){ clearSession(); redirectToLogin(); }
   window.requireAuth=requireAuth; window.adminLogin=adminLogin; window.adminLogout=adminLogout; window.getAdminSession=getSession; window.getAdminAuthHeaders=function(){ const s=getSession(); const h={}; if(s?.apiToken){ h['Authorization'] = `Bearer ${s.apiToken}`; } return h; };
 })();

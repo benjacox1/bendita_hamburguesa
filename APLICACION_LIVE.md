@@ -36,7 +36,7 @@ cd backend
 railway deploy
 
 # 3. Configurar variables de entorno automáticamente
-railway variables set MP_ACCESS_TOKEN=APP_USR-7288332386101364-100812-eb806e1db8942dd3de0092b4c4da1752-1063053683
+railway variables set MP_ACCESS_TOKEN=APP_USR-REDACTED
 railway variables set PORT=4000
 railway variables set NODE_ENV=production
 ```

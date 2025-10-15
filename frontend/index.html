@@ -94,7 +94,8 @@
     // Mostrar notificación de bienvenida
     setTimeout(() => {
       if (window.showSuccess) {
-        showSuccess('¡Bienvenido a Bendita Hamburguesa! 🍔');
+        const t = showSuccess('¡Bienvenido a Bendita Hamburguesa! 🍔');
+        if (t && t.classList) t.classList.add('toast-welcome');
       }
     }, 1000);
   </script>

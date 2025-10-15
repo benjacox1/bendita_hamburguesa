@@ -9,6 +9,7 @@ plugins = []
 [build]
 publish = "E:\\paginaweb\\frontend\\frontend"
 publishOrigin = "config"
+base = "E:\\paginaweb\\frontend"
 
 [build.environment]
 NODE_VERSION = "18"
@@ -69,6 +70,54 @@ from = "/webhooks/*"
 to = "https://bendita-hamburguesa-api.railway.app/webhooks/:splat"
 status = 200.0
 force = true
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/paneladmin"
+to = "/PanelAdmin/login.html"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/paneladmin/"
+to = "/PanelAdmin/login.html"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/paneladmin/*"
+to = "/PanelAdmin/:splat"
+status = 301.0
+force = false
+
+[redirects.query]
+
+[redirects.conditions]
+
+[redirects.headers]
+
+[[redirects]]
+from = "/PanelAdmin"
+to = "/PanelAdmin/login.html"
+status = 301.0
+force = false
 
 [redirects.query]
 

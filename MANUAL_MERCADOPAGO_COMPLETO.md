@@ -79,7 +79,7 @@ node tunnel-cloudflared.mjs
 ## 💳 Configuración de MercadoPago
 
 ### Credenciales Actuales (Ya Configuradas):
-- **Access Token**: `APP_USR-7288332386101364-100812-eb806e1db8942dd3de0092b4c4da1752-1063053683`
+- **Access Token**: `APP_USR-REDACTED` (nunca publiques tu token real; usa variables de entorno)
 - **Modo**: TEST (para pruebas)
 - **Webhook**: Se configura automáticamente
 
