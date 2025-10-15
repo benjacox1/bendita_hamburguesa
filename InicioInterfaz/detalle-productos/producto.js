@@ -55,7 +55,7 @@ function renderMiniCart(){
   const total = items.reduce((acc,i)=> acc + (Number(i.precio)*Number(i.cantidad)||0), 0);
   const rows = items.slice(0,6).map(i=> `
     <div class="item">
-      <img src="../detalle-productos/${(i.imagen||'').replace(/^\/*/, '')}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #29313b" alt="${i.nombre}">
+  <img src="${(window.APP_CONFIG?.BACKEND||'http://localhost:4000') + '/imagenes/' + encodeURIComponent(((i.imagen||'').replace(/^\/*/, '').split('/').pop()))}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #29313b" alt="${i.nombre}">
       <div>
         <div class="name">${i.nombre}</div>
         <div class="meta">${i.cantidad} × $ ${Number(i.precio).toFixed(2)}</div>
@@ -106,11 +106,11 @@ async function init(){
     const imgPath = (prod.imagen || '').replace(/^\/*/, '');
     const fileName = imgPath.split('/').pop();
     const v = (window.APP_CONFIG?.ASSET_VERSION ?? 1);
-    const finalSrc = 'IMAGENES COMIDA/' + encodeURIComponent(fileName) + '?v=' + v;
+  const finalSrc = (window.APP_CONFIG?.BACKEND || 'http://localhost:4000') + '/imagenes/' + encodeURIComponent(fileName) + '?v=' + v;
     console.log('[DETALLE] Render producto', { id: prod.id, finalSrc, modoFallback });
     const pre = new Image(); pre.src = finalSrc;
     try {
-      const phResp = await fetch('IMAGENES COMIDA/placeholders.json?_=' + Date.now());
+  const phResp = await fetch(((window.APP_CONFIG?.BACKEND || 'http://localhost:4000') + '/imagenes/placeholders.json?_=' + Date.now()));
       if(phResp.ok){
         const ph = await phResp.json();
         const placeholder = ph[fileName];

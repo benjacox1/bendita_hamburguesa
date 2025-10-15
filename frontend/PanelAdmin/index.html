@@ -35,19 +35,22 @@
             <input required name="cliente" placeholder="Nombre del cliente" />
           </label>
           <label>
-            Producto / Detalle
-            <input required name="detalle" placeholder="Producto y detalles" />
-          </label>
-          <label>
-            Tipo
-            <select name="tipo">
-              <option value="alimento">Alimento</option>
-              <option value="bebida">Bebida</option>
+            Producto
+            <select required id="pedido-producto" name="productId">
+              <option value="">Cargando productos...</option>
             </select>
           </label>
           <label>
-            Importe ($)
-            <input type="number" step="0.01" min="0" name="importe" />
+            Precio (auto)
+            <input id="pedido-precio" type="text" readonly placeholder="$ 0.00" />
+          </label>
+          <label>
+            Categoría (auto)
+            <input id="pedido-categoria" type="text" readonly placeholder="-" />
+          </label>
+          <label>
+            Cantidad
+            <input type="number" min="1" value="1" name="cantidad" />
           </label>
         </div>
         <button type="submit" class="primary">Agregar Pedido</button>
@@ -64,11 +67,12 @@
           <tr>
             <th>#</th>
             <th>Cliente</th>
-            <th>Detalle</th>
-            <th>Tipo</th>
+            <th>Items</th>
             <th>Importe</th>
             <th>Estado</th>
+            <th>Pago</th>
             <th>Acciones</th>
+            <th>Creación</th>
             <th>Eliminar</th>
           </tr>
         </thead>
@@ -90,7 +94,12 @@
           </label>
           <label>
             Categoría
-            <input name="categoria" placeholder="Ej: Bebida, Comida..." />
+            <select name="categoria" id="prod-categoria">
+              <option value="comida">Comida</option>
+              <option value="bebida">Bebida</option>
+              <option value="combo">Combo</option>
+              <option value="promo">Promo</option>
+            </select>
           </label>
           <label>
             Stock Inicial
@@ -103,6 +112,10 @@
           <label>
             Precio ($)
             <input type="number" step="0.01" min="0" name="precio" />
+          </label>
+          <label>
+            Imagen (png/jpg/webp/avif)
+            <input type="file" name="imagen" id="prod-imagen" accept=".png,.jpg,.jpeg,.webp,.avif" />
           </label>
         </div>
         <button type="submit" class="primary">Guardar Producto</button>
@@ -118,6 +131,7 @@
         <thead>
           <tr>
             <th>#</th>
+            <th>Imagen</th>
             <th>Producto</th>
             <th>Categoría</th>
             <th>Precio</th>
@@ -135,7 +149,7 @@
   </main>
 
   <footer>
-    <small>Panel local (sin backend todavía). Estados de pedido: En Espera → Preparándose → Listo para Retirar → Retirado.</small>
+    <small>Panel conectado al backend. Flujo de pedido: En Espera → Preparándose → Listo para Retirar → Retirado.</small>
   </footer>
 
   <!-- Panel Debug Pedidos -->

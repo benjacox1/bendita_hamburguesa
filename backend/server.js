@@ -7,7 +7,8 @@ import { fileURLToPath } from 'url';
 import { nanoid } from 'nanoid';
 import mercadopago, { MercadoPagoConfig, Preference } from 'mercadopago';
 import { logApp, logWebhook } from './logger.js';
-import { existsSync, createReadStream } from 'fs';
+import { existsSync, createReadStream, mkdirSync } from 'fs';
+import multer from 'multer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -42,11 +43,35 @@ async function writeJSON(file, data) {
   await fs.writeFile(file, JSON.stringify(data, null, 2), 'utf8');
 }
 
-// GET productos
+// GET productos (incluye merging con catálogo estático si existe)
 app.get('/api/products', async (req, res) => {
   try {
-    const products = await readJSON(PRODUCTS_FILE);
-    res.json(products);
+    const products = await readJSON(PRODUCTS_FILE).catch(()=>[]);
+    // Intentar cargar catálogo estático de la interfaz (read-only) para que aparezcan en el Admin
+    const STATIC_PRODUCTS_FILE = path.join(__dirname, '..', 'InicioInterfaz', 'detalle-productos', 'productos.json');
+    let staticList = [];
+    try {
+      const txt = await fs.readFile(STATIC_PRODUCTS_FILE, 'utf8');
+      staticList = JSON.parse(txt);
+    } catch {}
+    // Merge: backend tiene prioridad; los no existentes se agregan con stock 0
+    const byId = new Map();
+    for (const p of products) byId.set(p.id, p);
+    for (const s of staticList) {
+      if (!byId.has(s.id)) {
+        byId.set(s.id, {
+          id: s.id,
+          nombre: s.nombre,
+          descripcion: s.descripcion || '',
+          precio: Number(s.precio) || 0,
+          categoria: s.categoria || 'otros',
+          imagen: s.imagen || '',
+          stock: 0, // empezar en 0; el admin podrá ajustar stock real
+          origen: 'static'
+        });
+      }
+    }
+    res.json(Array.from(byId.values()));
   } catch (e) {
     res.status(500).json({ error: 'Error leyendo productos', detail: e.message });
   }
@@ -69,7 +94,7 @@ app.get('/api/products/:id', async (req, res) => {
 // Admin: crear producto
 app.post('/api/products', requireAdmin, async (req, res) => {
   try {
-    const { id, nombre, descripcion, precio, categoria, imagen, stock } = req.body;
+    const { id, nombre, descripcion, precio, categoria, imagen, stock, stockMin } = req.body;
     if (!nombre || !precio) return res.status(400).json({ error: 'nombre y precio son obligatorios' });
     const products = await readJSON(PRODUCTS_FILE);
     const newProduct = {
@@ -79,7 +104,8 @@ app.post('/api/products', requireAdmin, async (req, res) => {
       precio: Number(precio) || 0,
       categoria: categoria || 'otros',
       imagen: imagen || '',
-      stock: Number.isFinite(stock) ? stock : 0
+      stock: Number.isFinite(stock) ? stock : 0,
+      stockMin: Number.isFinite(stockMin) ? stockMin : 5
     };
     if (products.some(p => p.id === newProduct.id)) {
       return res.status(409).json({ error: 'Ya existe un producto con ese id' });
@@ -104,6 +130,10 @@ app.put('/api/products/:id', requireAdmin, async (req, res) => {
     const updated = { ...current, ...req.body };
     if (req.body.precio !== undefined) updated.precio = Number(req.body.precio);
     if (req.body.stock !== undefined) updated.stock = Number(req.body.stock);
+    if (req.body.imagen !== undefined) {
+      // Normalizar ruta de imagen: sólo archivo o subruta bajo carpeta permitida
+      updated.imagen = String(req.body.imagen).replace(/^\/*/, '');
+    }
     products[idx] = updated;
     await writeJSON(PRODUCTS_FILE, products);
     res.json(updated);
@@ -682,6 +712,50 @@ async function reponerStock(order) {
 // - Sólo sirve archivos dentro de la carpeta permitida
 const IMAGES_DIR = path.join(__dirname, '..', 'InicioInterfaz', 'detalle-productos', 'IMAGENES COMIDA');
 const LEGACY_IMAGES_DIR = path.join(__dirname, '..', 'InicioInterfaz', 'detalle de los productos', 'IMAGENES COMIDA');
+
+// Asegurar directorio de imágenes
+try { if(!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true }); } catch {}
+
+// ================== SUBIDA DE IMÁGENES ==================
+// Configuración de multer para recibir archivos en memoria y decidir nombre
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, IMAGES_DIR);
+  },
+  filename: function (req, file, cb) {
+    // Sanitizar nombre: mantener extensión original, reemplazar espacios
+    const safe = (file.originalname||'archivo').replace(/[^A-Za-z0-9_.\-\s]/g,'').replace(/\s+/g,' ').trim();
+    cb(null, safe);
+  }
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    const ok = /\.(png|jpg|jpeg|webp|avif)$/i.test(file.originalname||'');
+    if(!ok) return cb(new Error('Formato no permitido (png, jpg, jpeg, webp, avif)'));
+    cb(null, true);
+  }
+});
+
+// Admin: subir imagen y opcionalmente asociarla a un producto
+app.post('/api/products/:id/image', requireAdmin, upload.single('imagen'), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const products = await readJSON(PRODUCTS_FILE);
+    const idx = products.findIndex(p => p.id === id);
+    if (idx === -1) return res.status(404).json({ error: 'Producto no encontrado' });
+    if (!req.file) return res.status(400).json({ error: 'Archivo requerido con campo "imagen"' });
+    const fileName = req.file.filename;
+    // Guardar ruta relativa que usa el frontend: "IMAGENES COMIDA/<archivo>"
+    const relativePath = `IMAGENES COMIDA/${fileName}`;
+    products[idx].imagen = relativePath;
+    await writeJSON(PRODUCTS_FILE, products);
+    res.json({ ok: true, imagen: relativePath });
+  } catch (e) {
+    res.status(500).json({ error: 'Error subiendo imagen', detail: e.message });
+  }
+});
 
 app.get('/imagenes/placeholders.json', (req, res) => {
   try {

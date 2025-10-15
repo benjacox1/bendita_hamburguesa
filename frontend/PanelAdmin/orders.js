@@ -7,6 +7,9 @@ let pedidos = [];
 let pedidosPreviosMap = new Map(); // para detectar cambios en paymentStatus
 
 const formPedido = document.getElementById('form-nuevo-pedido');
+const selectProducto = document.getElementById('pedido-producto');
+const precioAuto = document.getElementById('pedido-precio');
+const catAuto = document.getElementById('pedido-categoria');
 const tbodyPedidos = document.querySelector('#tabla-pedidos tbody');
 const filtroPedidos = document.getElementById('filtro-pedidos');
 const btnLimpiarPedidos = document.getElementById('limpiar-pedidos');
@@ -29,6 +32,29 @@ async function cargarPedidos(){
     console.error('[PEDIDOS] No se pudieron cargar pedidos:', e);
     pedidos = [];
   }
+}
+
+async function cargarProductosParaSelect(){
+  if(!selectProducto) return;
+  try{
+    const prods = await fetch(API_BASE + '/products', { headers: { ...(window.getAdminAuthHeaders?.()||{}) } }).then(r=>r.json());
+    // Cache local para consulta rápida de precio/cat
+    window.__ADMIN_PRODS = prods.reduce((acc,p)=>{ acc[p.id]=p; return acc; },{});
+    selectProducto.innerHTML = '<option value="">Seleccione un producto</option>' +
+      prods.map(p => `<option value="${p.id}">${p.nombre} — $${Number(p.precio||0).toFixed(2)}</option>`).join('');
+    // Prellenar si hay uno seleccionado
+    actualizarAutoFields();
+  }catch{
+    selectProducto.innerHTML = '<option value="">No se pudieron cargar productos</option>';
+  }
+}
+
+function actualizarAutoFields(){
+  if(!selectProducto) return;
+  const id = selectProducto.value;
+  const p = (window.__ADMIN_PRODS||{})[id];
+  if(precioAuto) precioAuto.value = p ? `$ ${Number(p.precio||0).toFixed(2)}` : '';
+  if(catAuto) catAuto.value = p ? (p.categoria || '-') : '';
 }
 
 async function crearPedidoManual(data){
@@ -98,7 +124,7 @@ function renderPedidos() {
   if (!filtrado.length) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
-    td.colSpan = 8;
+    td.colSpan = 9;
     td.innerHTML = '<div class="empty-msg">Sin pedidos por el momento.</div>';
     tr.appendChild(td); tbodyPedidos.appendChild(tr); return;
   }
@@ -145,7 +171,12 @@ if(formPedido){
     data.cantidad = parseInt(data.cantidad||'1');
     await crearPedidoManual(data);
     formPedido.reset();
+    await cargarProductosParaSelect();
   });
+}
+
+if(selectProducto){
+  selectProducto.addEventListener('change', actualizarAutoFields);
 }
 
 if (btnLimpiarPedidos) {
@@ -242,6 +273,7 @@ function sanitizeCSV(val){
 
 // Inicial
 (async function initAdmin(){
+  await cargarProductosParaSelect();
   await cargarPedidos();
   renderPedidos();
   // Polling cada 10s

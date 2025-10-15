@@ -32,10 +32,8 @@ async function cargarPedidos(){
 }
 
 async function crearPedidoManual(data){
-  // Para mantener compatibilidad, creamos un pedido con 1 item artificial si no se especifica
-  // Lo ideal es tener un selector de producto. Aquí usamos un productId ficticio imposible de descontar (backend lo rechazará si no existe)
   if(!data.productId){
-    alert('Para crear pedidos manuales necesitas un productId válido (adapta el formulario).');
+    alert('Seleccione un producto');
     return;
   }
   const body = {
@@ -98,7 +96,7 @@ function renderPedidos() {
   if (!filtrado.length) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
-    td.colSpan = 8;
+  td.colSpan = 9;
     td.innerHTML = '<div class="empty-msg">Sin pedidos por el momento.</div>';
     tr.appendChild(td); tbodyPedidos.appendChild(tr); return;
   }
@@ -137,7 +135,44 @@ function renderPedidos() {
   updateDebug();
 }
 
-// Formulario manual (requiere adaptar HTML para incluir productId y cantidad)
+// Cache de productos para selector
+let cacheProductos = [];
+async function cargarProductosParaPedidos(){
+  try {
+    const r = await fetch(API_BASE + '/products', { headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
+    cacheProductos = r.ok ? await r.json() : [];
+  } catch { cacheProductos = []; }
+}
+
+function poblarSelectorProductos(){
+  const sel = document.getElementById('pedido-producto');
+  if(!sel) return;
+  // limpiar opciones (dejando placeholder)
+  [...sel.querySelectorAll('option')].forEach((o,i)=>{ if(i>0) o.remove(); });
+  cacheProductos.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = `${p.nombre} — $${Number(p.precio).toFixed(2)} (${p.categoria})`;
+    opt.dataset.precio = p.precio;
+    opt.dataset.categoria = p.categoria || '';
+    sel.appendChild(opt);
+  });
+}
+
+function hookAutoCompletarPedido(){
+  const sel = document.getElementById('pedido-producto');
+  const precio = document.getElementById('pedido-precio');
+  const cat = document.getElementById('pedido-categoria');
+  if(!sel || !precio || !cat) return;
+  sel.addEventListener('change', ()=>{
+    const opt = sel.selectedOptions[0];
+    if(!opt){ precio.value=''; cat.value=''; return; }
+    precio.value = Number(opt.dataset.precio||0).toFixed(2);
+    cat.value = opt.dataset.categoria || '';
+  });
+}
+
+// Formulario manual adaptado con productId y cantidad
 if(formPedido){
   formPedido.addEventListener('submit', async e => {
     e.preventDefault();
@@ -145,6 +180,9 @@ if(formPedido){
     data.cantidad = parseInt(data.cantidad||'1');
     await crearPedidoManual(data);
     formPedido.reset();
+    // refrescar selector tras crear pedido por si cambió stock
+    await cargarProductosParaPedidos();
+    poblarSelectorProductos();
   });
 }
 
@@ -242,12 +280,14 @@ function sanitizeCSV(val){
 
 // Inicial
 (async function initAdmin(){
-  await cargarPedidos();
+  await Promise.all([cargarPedidos(), cargarProductosParaPedidos()]);
   renderPedidos();
+  poblarSelectorProductos();
+  hookAutoCompletarPedido();
   // Polling cada 10s
   setInterval(async ()=>{
     const old = new Map(pedidosPreviosMap); // copia para comparar
-    await cargarPedidos();
+    await Promise.all([cargarPedidos(), cargarProductosParaPedidos()]);
     renderPedidos();
     // (La comparación se hace dentro de renderPedidos con pedidosPreviosMap)
   }, 10000);

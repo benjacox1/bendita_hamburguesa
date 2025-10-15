@@ -23,7 +23,7 @@ function render(){
     const tr = document.createElement('tr');
     const subtotal = it.precio * it.cantidad;
     total += subtotal;
-  tr.innerHTML = `\n      <td class="prod-cell">${it.imagen?`<img class=inline-img src="../detalle-productos/${it.imagen}" alt="">`:''}<span>${it.nombre}</span></td>\n      <td>${formatearPrecio(it.precio)}</td>\n      <td><input type=number min=1 value="${it.cantidad}" data-id="${it.id}" class="inp-cant" /></td>\n      <td>${formatearPrecio(subtotal)}</td>\n      <td><button data-del="${it.id}" title="Eliminar">✕</button></td>`;
+  tr.innerHTML = `\n      <td class="prod-cell">${it.imagen?`<img class=inline-img src="${(window.APP_CONFIG?.BACKEND||'http://localhost:4000') + '/imagenes/' + encodeURIComponent(((it.imagen||'').replace(/^\/*/, '').split('/').pop()))}" alt="">`:''}<span>${it.nombre}</span></td>\n      <td>${formatearPrecio(it.precio)}</td>\n      <td><input type=number min=1 value="${it.cantidad}" data-id="${it.id}" class="inp-cant" /></td>\n      <td>${formatearPrecio(subtotal)}</td>\n      <td><button data-del="${it.id}" title="Eliminar">✕</button></td>`;
     tbody.appendChild(tr);
   });
   totalSpan.textContent = formatearPrecio(total);

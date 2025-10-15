@@ -22,9 +22,10 @@ async function cargarProductos(){
 }
 
 async function crearProducto(data){
-  const body = { nombre: data.nombre, categoria: data.categoria, precio: parseFloat(data.precio||'0'), stock: parseInt(data.stock||'0'), descripcion: '', imagen: '' };
+  const body = { nombre: data.nombre, categoria: data.categoria, precio: parseFloat(data.precio||'0'), stock: parseInt(data.stock||'0'), stockMin: parseInt(data.stockMin||'5')||5, descripcion: '', imagen: '' };
   const r = await fetch(API_BASE + '/products', { method:'POST', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify(body) });
-  if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Error creando producto: '+err.error); }
+  if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Error creando producto: '+err.error); return null; }
+  return await r.json();
 }
 async function actualizarProducto(id, patch){
   const r = await fetch(`${API_BASE}/products/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify(patch) });
@@ -65,7 +66,7 @@ function renderProductos(){
   if(!filtrado.length){
     const tr = document.createElement('tr');
     const td = document.createElement('td');
-    td.colSpan = 8;
+  td.colSpan = 9;
     td.innerHTML = '<div class="empty-msg">Sin productos cargados.</div>';
     tr.appendChild(td); tbodyStock.appendChild(tr); return;
   }
@@ -74,6 +75,7 @@ function renderProductos(){
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${i+1}</td>
+         <td>${p.imagen?`<img src="${(window.APP_CONFIG?.BACKEND||'http://localhost:4000') + '/imagenes/' + encodeURIComponent((((p.imagen||'').replace(/^\\\/*/, '')).split('/').pop()))}" alt="${p.nombre}" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #29313b"/>`:''}</td>
       <td>${p.nombre}</td>
       <td>${p.categoria||'-'}</td>
       <td>${Number(p.precio||0).toFixed(2)}</td>
@@ -107,8 +109,19 @@ function renderProductos(){
 if(formProducto){
   formProducto.addEventListener('submit', async e => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(formProducto).entries());
-    await crearProducto(data);
+    const fd = new FormData(formProducto);
+    const data = Object.fromEntries(fd.entries());
+    // Crear producto primero
+    const nuevo = await crearProducto(data);
+    if(!nuevo){ return; }
+    // Si hay imagen, subirla y asociar
+    const file = fd.get('imagen');
+    if(file && file.size){
+      const up = new FormData();
+      up.append('imagen', file);
+      const r = await fetch(`${API_BASE}/products/${encodeURIComponent(nuevo.id)}/image`, { method:'POST', headers: { ...(window.getAdminAuthHeaders?.()||{}) }, body: up });
+      if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Subida de imagen falló: '+err.error); }
+    }
     formProducto.reset();
     await cargarProductos();
     renderProductos();
