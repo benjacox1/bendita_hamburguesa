@@ -12,7 +12,7 @@ import multer from 'multer';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DATA_DIR = path.join(__dirname, 'data');
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, 'data');
 const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 const ORDERS_FILE = path.join(DATA_DIR, 'orders.json');
 
@@ -710,10 +710,13 @@ async function reponerStock(order) {
 // - Parámetro ?v= para cache busting (sólo cambia la URL)
 // - Sirve también placeholders.json (no cache infinito para poder regenerar)
 // - Sólo sirve archivos dentro de la carpeta permitida
-const IMAGES_DIR = path.join(__dirname, '..', 'InicioInterfaz', 'detalle-productos', 'IMAGENES COMIDA');
-const LEGACY_IMAGES_DIR = path.join(__dirname, '..', 'InicioInterfaz', 'detalle de los productos', 'IMAGENES COMIDA');
+const DEFAULT_IMAGES_DIR = path.join(__dirname, '..', 'InicioInterfaz', 'detalle-productos', 'IMAGENES COMIDA');
+const DEFAULT_LEGACY_IMAGES_DIR = path.join(__dirname, '..', 'InicioInterfaz', 'detalle de los productos', 'IMAGENES COMIDA');
+const IMAGES_DIR = process.env.IMAGES_DIR || DEFAULT_IMAGES_DIR;
+const LEGACY_IMAGES_DIR = process.env.LEGACY_IMAGES_DIR || DEFAULT_LEGACY_IMAGES_DIR;
 
 // Asegurar directorio de imágenes
+try { if(!existsSync(DATA_DIR)) mkdirSync(DATA_DIR, { recursive: true }); } catch {}
 try { if(!existsSync(IMAGES_DIR)) mkdirSync(IMAGES_DIR, { recursive: true }); } catch {}
 
 // ================== SUBIDA DE IMÁGENES ==================

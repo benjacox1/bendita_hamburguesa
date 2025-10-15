@@ -5,9 +5,37 @@
 (() => {
   const DEFAULT_PORT = 4000;
   const loc = window.location;
+  const LS_KEY = 'APP_BACKEND_URL';
+  // Intentar leer override desde backend.json (sincrónico para inicializar antes que el resto)
+  function readBackendJson(){
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', 'backend.json', false);
+      xhr.send(null);
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const obj = JSON.parse(xhr.responseText||'{}');
+        if (obj && obj.backend && /^https?:\/\//i.test(obj.backend)) return obj.backend;
+      }
+    } catch {}
+    return '';
+  }
+  // Permitir override por query (?backend=https://mi-backend.dominio)
+  try {
+    const qp = new URLSearchParams(loc.search);
+    const backendQP = qp.get('backend');
+    if (backendQP && /^https?:\/\//i.test(backendQP)) {
+      localStorage.setItem(LS_KEY, backendQP);
+    }
+  } catch {}
+  const stored = (()=>{ try { return localStorage.getItem(LS_KEY) || ''; } catch { return ''; } })();
   // Si estamos ya en el puerto del backend (4000) asumimos mismo origen.
   let candidate;
-  if(loc.protocol.startsWith('http') && Number(loc.port) === DEFAULT_PORT){
+  const fileOverride = readBackendJson();
+  if (stored) {
+    candidate = stored;
+  } else if (fileOverride) {
+    candidate = fileOverride;
+  } else if(loc.protocol.startsWith('http') && Number(loc.port) === DEFAULT_PORT){
     candidate = loc.origin; // mismo host:puerto
   } else {
     // Manejar file:// o cualquier otro puerto → apuntar al backend estándar
@@ -29,4 +57,10 @@
       console.warn('[CONFIG] Backend no responde en', window.APP_CONFIG.BACKEND, '— se usará fallback local en catálogos.');
       window.APP_CONFIG.BACKEND_UNAVAILABLE = true;
     });
+  // Utilidad para cambiar backend desde consola o UI
+  window.__setBackend = function(url){
+    try { if(url) localStorage.setItem(LS_KEY, url); else localStorage.removeItem(LS_KEY); } catch {}
+    alert('Backend actualizado. Recargando...');
+    location.reload();
+  };
 })();

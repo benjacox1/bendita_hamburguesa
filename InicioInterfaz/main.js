@@ -148,7 +148,11 @@ function render(){
     const parts = imgPath.split('/');
     const fileName = parts[parts.length-1];
   const v = (window.APP_CONFIG?.ASSET_VERSION ?? 1);
-    const finalSrc = (window.APP_CONFIG?.BACKEND || 'http://localhost:4000') + '/imagenes/' + encodeURIComponent(fileName) + '?v=' + v;
+    const backend = (window.APP_CONFIG?.BACKEND || 'http://localhost:4000');
+    const backendOk = !window.APP_CONFIG?.BACKEND_UNAVAILABLE;
+    const finalSrc = backendOk
+      ? (backend + '/imagenes/' + encodeURIComponent(fileName) + '?v=' + v)
+      : ('detalle-productos/IMAGENES COMIDA/' + encodeURIComponent(fileName) + '?v=' + v);
     const placeholder = PLACEHOLDERS[fileName];
     img.loading = 'lazy';
     img.classList.add('blur-up');

@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: bendita-hamburguesa-backend
+    env: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeploy: true
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: ADMIN_TOKEN
+        sync: false
+      - key: DATA_DIR
+        value: /var/data/data
+      - key: IMAGES_DIR
+        value: /var/data/images
+    disk:
+      name: app-data
+      mountPath: /var/data
+      sizeGB: 1
