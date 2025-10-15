@@ -118,6 +118,10 @@ backend/
 | PATCH | /api/orders/:id/state | Cambia estado de pedido |
 | DELETE | /api/orders/:id | Elimina un pedido |
 | POST | /api/payments/preference | Crea preferencia (real si MP_ACCESS_TOKEN, caso contrario simulada) |
+| GET  | /api/payments/config | Config de pagos: proveedor actual (mercadopago/vexor/simulated) |
+| POST | /api/payments/vexor/session | Crea sesión de checkout Vexor (simulado si falta secret) |
+| GET  | /pago/vexor/:orderId | Pantalla de checkout Vexor simulada (elige resultado) |
+| GET  | /api/payments/vexor/simulate | Callback que aplica resultado y redirige con ?pago= |
 | POST | /webhooks/mercadopago | Webhook Mercado Pago (simulado) |
 | GET | /api/stats | Resumen simple de pedidos |
 
@@ -234,6 +238,9 @@ Campos añadidos al pedido:
 | `MP_BACK_FAILURE` | `http://localhost:4000/?pago=failure` | URL retorno pagos fallidos. |
 | `MP_BACK_PENDING` | `http://localhost:4000/?pago=pending` | URL retorno pagos pendientes. |
 | `MP_WEBHOOK` | `http://localhost:4000/webhooks/mercadopago` | URL webhook público. |
+| `NEXT_PUBLIC_VEXOR_PROJECT` | `68efe6...` | ID de proyecto Vexor (expuesto al frontend vía /payments/config). |
+| `NEXT_PUBLIC_VEXOR_PUBLISHABLE_KEY` | `vx_prod_pk_...` | Publishable key Vexor (frontend). |
+| `VEXOR_SECRET_KEY` | `vx_prod_sk_...` | Secret key Vexor (si falta, el backend usa modo simulado). |
 
 ### Ejemplo request preferencia (real o simulado)
 ```json
@@ -272,6 +279,18 @@ POST /webhooks/mercadopago
 3. Usar respuesta `init_point` para redirigir a pago.
 4. Validar notificaciones: opcionalmente consultar Payment API antes de confirmar.
 5. Guardar logs y monitorear estados inesperados.
+
+## Pagos Vexor (Simulado e Habilitable)
+
+Cuando se configuran variables Vexor, el endpoint `/api/payments/config` reporta `provider: "vexor"`. El frontend del carrito conmutará a usar Vexor en lugar de MercadoPago.
+
+- Si `VEXOR_SECRET_KEY` NO está presente, el backend expone un flujo simulado:
+  - `POST /api/payments/vexor/session` devuelve `checkout_url` apuntando a `/pago/vexor/:orderId` (pantalla local).
+  - En esa pantalla puedes elegir aprobar/rechazar/pendiente. Esto llama a `GET /api/payments/vexor/simulate` que actualiza el pedido y redirige a la página pública con `?pago=`.
+
+- Si `VEXOR_SECRET_KEY` SÍ está presente, deberás implementar la llamada real a la API de Vexor en `/api/payments/vexor/session` (por ahora retorna 501 con instrucciones mínimas).
+
+Frontend: `InicioInterfaz/Carrito de compras/carrito.js` detecta el proveedor y redirige a `checkout_url` (Vexor) o `init_point` (MercadoPago).
 
 ### Seguridad
 - Limitar origen del webhook (IP allowlist o verificación de firma).

@@ -376,7 +376,11 @@ app.get('/api/payments/config', (req, res) => {
   const hasToken = !!process.env.MP_ACCESS_TOKEN;
   const vexorProject = process.env.NEXT_PUBLIC_VEXOR_PROJECT || process.env.VEXOR_PROJECT || null;
   const vexorPublishable = process.env.NEXT_PUBLIC_VEXOR_PUBLISHABLE_KEY || process.env.VEXOR_PUBLISHABLE_KEY || null;
-  const provider = vexorPublishable ? 'vexor' : (hasToken ? 'mercadopago' : 'simulated');
+  const vexorSecret = process.env.VEXOR_SECRET_KEY || null;
+  const vexorApiBase = process.env.VEXOR_API_BASE || null;
+  const provider = (vexorProject || vexorPublishable || vexorSecret || vexorApiBase)
+    ? 'vexor'
+    : (hasToken ? 'mercadopago' : 'simulated');
   res.json({
     mode: hasToken ? 'real' : 'simulated',
     provider,
@@ -389,7 +393,9 @@ app.get('/api/payments/config', (req, res) => {
     webhook: process.env.MP_WEBHOOK || null,
     vexor: {
       project: vexorProject,
-      publishableKeyPresent: !!vexorPublishable
+      publishableKeyPresent: !!vexorPublishable,
+      secretPresent: !!vexorSecret,
+      apiBasePresent: !!vexorApiBase
     }
   });
 });
@@ -407,9 +413,9 @@ app.post('/api/payments/vexor/session', async (req, res) => {
     if(!order.items?.length) return res.status(400).json({ error: 'Pedido sin items' });
     if(!order.importe || order.importe <= 0) return res.status(400).json({ error: 'Importe inválido' });
 
-    const secret = process.env.VEXOR_SECRET_KEY;
-    const project = process.env.NEXT_PUBLIC_VEXOR_PROJECT || process.env.VEXOR_PROJECT || 'project';
-    const publishable = process.env.NEXT_PUBLIC_VEXOR_PUBLISHABLE_KEY || process.env.VEXOR_PUBLISHABLE_KEY || 'pub';
+  const secret = process.env.VEXOR_SECRET_KEY;
+  const apiBase = (process.env.VEXOR_API_BASE || '').replace(/\/$/, '');
+  const project = process.env.NEXT_PUBLIC_VEXOR_PROJECT || process.env.VEXOR_PROJECT || 'project';
 
     // Simulación si no hay SECRET: usamos una pantalla local para elegir estado
     if(!secret){
@@ -421,11 +427,63 @@ app.post('/api/payments/vexor/session', async (req, res) => {
       return res.json({ checkout_url: url, simulated: true, provider: 'vexor' });
     }
 
-    // Si hubiera docs oficiales, aquí haríamos fetch a la API real de Vexor.
-    // Dejamos una respuesta 501 para indicar que falta configurar el endpoint real.
+    // Si hay SECRET y API_BASE, intentar crear sesión real en Vexor
+    if (secret && apiBase) {
+      // Asegurar externalReference
+      if(!order.externalReference){
+        order.externalReference = 'ref_' + order.id + '_' + Date.now();
+        await writeJSON(ORDERS_FILE, orders);
+      }
+      const back_success = `${dynamicBase}/?pago=success&order_id=${order.id}`;
+      const back_failure = `${dynamicBase}/?pago=failure&order_id=${order.id}`;
+      const back_pending = `${dynamicBase}/?pago=pending&order_id=${order.id}`;
+
+      const payload = {
+        project,
+        amount: Number(order.importe),
+        currency: 'ARS',
+        reference: order.externalReference,
+        success_url: back_success,
+        failure_url: back_failure,
+        pending_url: back_pending,
+        items: (order.items||[]).map(it => ({
+          name: it.nombre,
+          quantity: Number(it.cantidad||1),
+          unit_price: Number(it.precioUnitario||0),
+          currency: 'ARS'
+        }))
+      };
+      try {
+        const resp = await fetch(`${apiBase}/checkout/sessions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${secret}`
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json().catch(()=>({}));
+        if(!resp.ok){
+          return res.status(502).json({ error: 'Vexor API error', status: resp.status, data });
+        }
+        const checkoutUrl = data.checkout_url || data.url || data.redirect_url || data.link;
+        if(!checkoutUrl){
+          return res.status(500).json({ error: 'Respuesta Vexor sin checkout_url', data });
+        }
+        // Marcar processing
+        order.paymentStatus = 'processing';
+        order.paymentCreated = Date.now();
+        await writeJSON(ORDERS_FILE, orders);
+        return res.json({ checkout_url: checkoutUrl, simulated: false, provider: 'vexor', session: data });
+      } catch (e) {
+        return res.status(500).json({ error: 'Error llamando a Vexor', detail: e.message });
+      }
+    }
+
+    // Si no hay API_BASE, indicar que falta configuración para real
     return res.status(501).json({
       error: 'Integración Vexor real no configurada',
-      detail: 'Provee VEXOR_API_BASE y documentación del endpoint para crear sesión. Por ahora se usa modo simulado cuando falta VEXOR_SECRET_KEY.',
+      detail: 'Define VEXOR_API_BASE para crear sesiones reales; sin eso se usa el modo simulado.',
       provider: 'vexor'
     });
   } catch(e){
