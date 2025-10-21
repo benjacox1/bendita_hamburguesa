@@ -6,6 +6,7 @@ const BUSCADOR = document.getElementById('buscador');
 const CATEGORIA = document.getElementById('categoria');
 const ORDEN = document.getElementById('orden');
 const LIMPIAR = document.getElementById('limpiar');
+const REFRESCAR = document.getElementById('refrescar');
 const YEAR = document.getElementById('year');
 YEAR.textContent = new Date().getFullYear();
 const LS_CARRITO = 'carrito_items_v1';
@@ -30,15 +31,24 @@ function renderMiniCart(){
   if(!panel) return;
   const items = leerCarrito();
   const total = items.reduce((acc,i)=> acc + (Number(i.precio)*Number(i.cantidad)||0), 0);
-  const rows = items.slice(0,6).map(i=> `
+  const backend = (window.APP_CONFIG?.BACKEND || 'http://localhost:4000');
+  const backendOk = !window.APP_CONFIG?.BACKEND_UNAVAILABLE;
+  const rows = items.slice(0,6).map(i=> {
+    const imgPath = (i.imagen||'').replace(/^\/*/, '');
+    const parts = imgPath.split('/');
+    const fileName = parts[parts.length-1];
+    const v = (window.APP_CONFIG?.ASSET_VERSION ?? 1);
+    const thumb = backendOk ? (backend + '/imagenes/' + encodeURIComponent(fileName) + '?v=' + v)
+                            : ('detalle-productos/IMAGENES COMIDA/' + encodeURIComponent(fileName) + '?v=' + v);
+    return `
     <div class="item">
-      <img src="detalle-productos/${(i.imagen||'').replace(/^\/*/, '')}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #29313b" alt="${i.nombre}">
+      <img src="${thumb}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;border:1px solid #29313b" alt="${i.nombre}">
       <div>
         <div class="name">${i.nombre}</div>
         <div class="meta">${i.cantidad} × $ ${Number(i.precio).toFixed(2)}</div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
   panel.innerHTML = `
     <header>
       <strong>Tu carrito</strong>
@@ -141,14 +151,16 @@ function render(){
   filtrado.forEach(p => {
     const node = tpl.content.cloneNode(true);
     const img = node.querySelector('.card-img');
-    // Usar carpeta local directamente
+    // Construir imagen: si backend está disponible, usar /imagenes; si no, usar carpeta local
     const imgPath = (p.imagen || '').replace(/^\/*/,'');
-    // Suponemos ahora todas las imágenes viven en la carpeta final servida por /imagenes
-    // products.json debe tener valores tipo: "IMAGENES COMIDA/archivo.png" o solo el nombre.
     const parts = imgPath.split('/');
     const fileName = parts[parts.length-1];
-  const v = (window.APP_CONFIG?.ASSET_VERSION ?? 1);
-    const finalSrc = 'detalle-productos/IMAGENES COMIDA/' + encodeURIComponent(fileName) + '?v=' + v;
+    const v = (window.APP_CONFIG?.ASSET_VERSION ?? 1);
+    const backend = (window.APP_CONFIG?.BACKEND || 'http://localhost:4000');
+    const backendOk = !window.APP_CONFIG?.BACKEND_UNAVAILABLE;
+    const finalSrc = backendOk
+      ? (backend + '/imagenes/' + encodeURIComponent(fileName) + '?v=' + v)
+      : ('detalle-productos/IMAGENES COMIDA/' + encodeURIComponent(fileName) + '?v=' + v);
     const placeholder = PLACEHOLDERS[fileName];
     img.loading = 'lazy';
     img.classList.add('blur-up');
@@ -185,6 +197,12 @@ ORDEN.addEventListener('change', aplicarFiltros);
 LIMPIAR.addEventListener('click', ()=>{
   BUSCADOR.value=''; CATEGORIA.value=''; ORDEN.value=''; aplicarFiltros();
 });
+
+if(REFRESCAR){
+  REFRESCAR.addEventListener('click', async ()=>{
+    await cargarProductos();
+  });
+}
 
 document.getElementById('btn-scroll-productos').addEventListener('click', e => {
   e.preventDefault();
@@ -270,6 +288,13 @@ GRID.addEventListener('click', (e)=>{
 // Sincronizar contador en cambios de storage (otras pestañas)
 window.addEventListener('storage', (e)=>{ if(e.key === LS_CARRITO) actualizarCartCount(); });
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) actualizarCartCount(); });
+
+// Auto-actualizar catálogo cuando el admin lo modifique en otra pestaña
+window.addEventListener('storage', async (e)=>{
+  if(e.key === 'catalog_updated_v1'){
+    await cargarProductos();
+  }
+});
 
 // Mostrar resultado de pago si vuelve con ?pago=success|failure|pending
 (function(){

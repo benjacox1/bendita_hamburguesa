@@ -2,16 +2,28 @@
 :root{
 	--bg:#0d0f12; --panel:#12161c; --panel-2:#161b22; --border:#1f242d; --muted:#9ca3af; --accent:#ff4d00;
 }
-body{margin:0;background:var(--bg);color:#f5f7fa;font-family:system-ui,Arial,sans-serif}
+body{margin:0;color:#f5f7fa;font-family:system-ui,Arial,sans-serif;
+	background:linear-gradient(120deg,#ff7a18,#ff4d00,#ff2d55,#ff9a3c,#ff4d00);
+	background-size:260% 260%;
+	animation:heroShift 16s ease-in-out infinite;
+}
+@keyframes heroShift{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 .container{max-width:1000px;margin:0 auto;padding:1.25rem}
 .topbar{display:flex;align-items:center;gap:.75rem;background:#111827;color:#fff;padding:.85rem 1rem;border-bottom:1px solid #1f242d}
 .topbar h1{margin:0;font-size:1.1rem}
-.back{color:#ffb087;text-decoration:none}
-.back:hover{text-decoration:underline}
+.back{color:#ffcfb3;text-decoration:none}
+.back:hover{text-decoration:none}
+/* Botón de regreso con estilo pill (carrito) */
+.btn-back{display:inline-flex;align-items:center;gap:.45rem;background:rgba(17,24,39,.6);border:1px solid #29313b;padding:.45rem .7rem;border-radius:999px;color:#fff;box-shadow:0 6px 18px -10px rgba(0,0,0,.6)}
+.btn-back .ico{opacity:.9}
+.btn-back:hover{transform:translateY(-1px);background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:transparent;box-shadow:0 10px 24px -12px rgba(37,99,235,.55)}
 .msg{background:linear-gradient(var(--panel),var(--panel-2));padding:1rem;border-radius:12px;border:1px solid var(--border);color:#cbd5e1}
 
 .tabla{width:100%;border-collapse:separate;border-spacing:0 10px;margin-top:1rem}
 .tabla thead th{font-size:.78rem;text-transform:uppercase;letter-spacing:.5px;color:#9ca3af;padding:.4rem .6rem}
+.tabla thead.head-chips th{padding:.6rem .6rem}
+.th-chip{display:inline-block;padding:.25rem .5rem;border:1px solid rgba(255,255,255,.15);border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04),0 6px 18px -14px rgba(0,0,0,.6);transition:background .25s, border-color .25s, color .25s, transform .2s, box-shadow .25s}
+.head-chips .th-chip:hover{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:transparent;color:#fff;transform:translateY(-1px);box-shadow:0 10px 24px -12px rgba(37,99,235,.55)}
 .tabla tbody tr{background:var(--panel);box-shadow:0 6px 22px -12px rgba(0,0,0,.7),0 0 0 1px var(--border)}
 .tabla td{padding:.75rem .7rem;border-bottom:1px solid rgba(255,255,255,.03)}
 .tabla td:last-child{text-align:center}
@@ -23,8 +35,12 @@ body{margin:0;background:var(--bg);color:#f5f7fa;font-family:system-ui,Arial,san
 .acciones{display:flex;gap:.75rem;margin-bottom:.75rem}
 button{cursor:pointer;border:1px solid #29313b;background:#1d232e;color:#fff;padding:.65rem 1rem;border-radius:10px;font-size:.85rem;transition:.3s;box-shadow:0 4px 16px -8px rgba(0,0,0,.5)}
 button:hover{transform:translateY(-2px)}
-button.primary{background:var(--accent);border-color:var(--accent);box-shadow:0 10px 28px -12px rgba(255,77,0,.9)}
-button.primary:hover{filter:brightness(1.05)}
+/* Botones tipo pill oscuros (estilo WhatsApp pero negro) */
+.btn-pill{border-radius:999px;padding:.65rem 1.05rem;display:inline-flex;align-items:center;gap:.35rem}
+.btn-dark{background:#0b0f14;border-color:#0b0f14;color:#fff;box-shadow:0 10px 26px -12px rgba(0,0,0,.9)}
+.btn-dark:hover{background:#111824;box-shadow:0 12px 30px -14px rgba(0,0,0,.9)}
+button.primary{background:var(--accent);border-color:var(--accent);box-shadow:0 10px 28px -12px rgba(255,77,0,.9);transition:background .3s, box-shadow .3s, transform .25s}
+button.primary:hover{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:transparent;box-shadow:0 12px 30px -12px rgba(37,99,235,.55);transform:translateY(-2px)}
 button.outline{background:#0f1318;color:#ffb087}
 button:disabled{opacity:.5;cursor:not-allowed}
 .mini{font-size:.75rem;margin-top:.4rem;color:#9ca3af}
@@ -45,3 +61,43 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .cart-mini .meta{font-size:.72rem;color:#9ca3af}
 .cart-mini .footer{display:flex;align-items:center;justify-content:space-between;padding:.6rem .75rem;background:#0f1318;border-top:1px solid var(--border)}
 .cart-mini .go{background:var(--accent);border:1px solid var(--accent);color:#fff;padding:.5rem .7rem;border-radius:10px;font-size:.8rem}
+
+/* Botón WhatsApp */
+.btn-whatsapp{display:inline-flex;align-items:center;gap:.45rem;background:#25D366;border:1px solid #25D366;color:#0b2a12;text-decoration:none;padding:.65rem 1rem;border-radius:999px;font-weight:600;box-shadow:0 10px 26px -12px rgba(37,211,102,.9)}
+.btn-whatsapp:hover{filter:brightness(1.05);transform:translateY(-2px)}
+.wa-icon{width:18px;height:18px;display:inline-block}
+
+/* Overlay de instrucciones */
+.instrucciones-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;z-index:1000}
+.instrucciones-overlay.show{display:flex}
+.instrucciones-panel{width:min(560px,92vw);background:var(--panel);border:1px solid var(--border);border-radius:14px;box-shadow:0 18px 60px -20px rgba(0,0,0,.8);overflow:hidden}
+.instr-header{display:flex;align-items:center;justify-content:space-between;padding:.9rem 1rem;border-bottom:1px solid var(--border)}
+.instr-header h2{margin:0;font-size:1rem}
+.instr-close{background:transparent;border:1px solid #29313b;color:#9ca3af;border-radius:8px;padding:.2rem .5rem;cursor:pointer}
+.instr-body{padding:1rem}
+.instr-form{display:flex;flex-direction:column;gap:.4rem;margin-bottom:.9rem}
+.instr-form label{font-size:.85rem;color:#cbd5e1}
+.instr-form input{background:#0f1318;border:1px solid #29313b;border-radius:10px;color:#fff;padding:.55rem .7rem}
+.instr-form small{color:#9ca3af}
+.instr-steps{margin:.2rem 0 1rem .9rem;color:#cbd5e1}
+.instr-steps li{margin:.5rem 0}
+.instr-pay-link{display:inline-block;background:var(--accent);border:1px solid var(--accent);color:#fff;padding:.6rem .9rem;border-radius:10px;text-decoration:none}
+.instr-pay-link{transition:background .3s, box-shadow .3s, transform .25s}
+.instr-pay-link:hover{background:linear-gradient(135deg,#2563eb,#1d4ed8);border-color:transparent;box-shadow:0 12px 30px -12px rgba(37,99,235,.55);transform:translateY(-2px)}
+
+/* Toast pedido */
+.toast-pedido{position:fixed;right:16px;bottom:16px;background:#111c;color:#fff;border:1px solid #444;padding:10px 14px;border-radius:10px;z-index:1200;backdrop-filter:blur(6px);opacity:0;transform:translateY(10px);transition:.25s}
+.toast-pedido.show{opacity:1;transform:translateY(0)}
+
+/* Footer panel con fondo negro translúcido */
+footer.footer{position:relative}
+footer.footer::before{content:"";position:absolute;inset:0;margin:0;background:rgba(0,0,0,.25);border-top:1px solid rgba(0,0,0,.45);backdrop-filter:blur(2px);z-index:0;border-radius:8px}
+footer.footer > small{position:relative;z-index:1}
+footer.footer a{display:inline-block;padding:.2rem .5rem;border-radius:10px;border:1px solid rgba(0,0,0,.45);background:rgba(0,0,0,.08);text-shadow:0 1px 1px rgba(0,0,0,.25);font-weight:700;letter-spacing:.2px;color:#000}
+footer.footer a:hover{border-color:rgba(0,0,0,.65);background:rgba(0,0,0,.14)}
+
+/* Overrides: cuando se usa btn-dark junto con primary/outline, gana el estilo oscuro */
+button.primary.btn-dark{background:#0b0f14;border-color:#0b0f14;color:#fff;box-shadow:0 10px 26px -12px rgba(0,0,0,.9)}
+button.primary.btn-dark:hover{background:#111824;box-shadow:0 12px 30px -14px rgba(0,0,0,.9)}
+button.outline.btn-dark{background:#0b0f14;border-color:#0b0f14;color:#fff}
+button.outline.btn-dark:hover{background:#111824}

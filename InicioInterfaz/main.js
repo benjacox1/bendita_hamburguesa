@@ -6,6 +6,7 @@ const BUSCADOR = document.getElementById('buscador');
 const CATEGORIA = document.getElementById('categoria');
 const ORDEN = document.getElementById('orden');
 const LIMPIAR = document.getElementById('limpiar');
+const REFRESCAR = document.getElementById('refrescar');
 const YEAR = document.getElementById('year');
 YEAR.textContent = new Date().getFullYear();
 const LS_CARRITO = 'carrito_items_v1';
@@ -190,6 +191,12 @@ LIMPIAR.addEventListener('click', ()=>{
   BUSCADOR.value=''; CATEGORIA.value=''; ORDEN.value=''; aplicarFiltros();
 });
 
+if(REFRESCAR){
+  REFRESCAR.addEventListener('click', async ()=>{
+    await cargarProductos();
+  });
+}
+
 document.getElementById('btn-scroll-productos').addEventListener('click', e => {
   e.preventDefault();
   document.getElementById('listado').scrollIntoView({behavior:'smooth'});
@@ -274,6 +281,13 @@ GRID.addEventListener('click', (e)=>{
 // Sincronizar contador en cambios de storage (otras pestañas)
 window.addEventListener('storage', (e)=>{ if(e.key === LS_CARRITO) actualizarCartCount(); });
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) actualizarCartCount(); });
+
+// Auto-actualizar catálogo cuando otra pestaña (admin) notifique cambios
+window.addEventListener('storage', async (e)=>{
+  if(e.key === 'catalog_updated_v1'){
+    await cargarProductos();
+  }
+});
 
 // Mostrar resultado de pago si vuelve con ?pago=success|failure|pending
 (function(){

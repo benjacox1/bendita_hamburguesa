@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bendita Hamburguesa - Panel Administración</title>
-  <link rel="stylesheet" href="admin.css?v=20251014" />
-  <script src="auth.js?v=20251014"></script>
+  <link rel="stylesheet" href="admin.css?v=20251020" />
+  <script src="auth.js?v=20251020"></script>
   <script>
     if (typeof requireAuth === 'function') {
       requireAuth();
@@ -59,6 +59,7 @@
         <input id="filtro-pedidos" placeholder="Filtrar por cliente o detalle..." />
         <button id="limpiar-pedidos" class="danger small">Limpiar Todos</button>
         <button id="refrescar-pedidos" class="small" style="background:#2563eb;color:#fff;">Refrescar</button>
+        <button id="diagnostico-pedidos" class="small" title="Diagnóstico rápido de API">Diagnóstico</button>
       </div>
 
       <table class="tabla" id="tabla-pedidos">
@@ -151,6 +152,9 @@
     <small>Panel conectado al backend. Estados: En Espera → Preparándose → Listo para Retirar → Retirado.</small>
   </footer>
 
+  <!-- Toast minimal -->
+  <div id="toast" style="position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#111821;color:#e6edf3;border:1px solid #2b3a49;padding:10px 14px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.35);display:none;z-index:9999"></div>
+
   <!-- Panel Debug Pedidos -->
   <div id="debug-toggle" class="debug-toggle" title="Mostrar/Ocultar Debug">🛠 Debug</div>
   <div id="debug-panel" class="debug-panel" hidden>
@@ -169,10 +173,18 @@
   </div>
 
   <script src="../config.js"></script>
-  <script src="tabs.js?v=20251014"></script>
-  <script src="orders.js?v=20251014"></script>
-  <script src="stock.js?v=20251014"></script>
+  <script src="tabs.js?v=20251020"></script>
+  <script src="orders.js?v=20251020"></script>
+  <script src="stock.js?v=20251020"></script>
   <script>
+    function showToast(msg){
+      const t = document.getElementById('toast');
+      if(!t) return;
+      t.textContent = msg;
+      t.style.display = 'block';
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=>{ t.style.display = 'none'; }, 1800);
+    }
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn && typeof adminLogout === 'function') {
       logoutBtn.addEventListener('click', () => adminLogout());

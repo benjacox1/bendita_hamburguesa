@@ -54,6 +54,7 @@
   window.APP_CONFIG = {
     BACKEND: candidate,
     API_BASE: candidate + '/api',
+    ADMIN_TOKEN: (function(){ try { return (JSON.parse(localStorage.getItem('APP_BACKEND_ADMIN')||'{}').token) || 'bh-admin-2025'; } catch { return 'bh-admin-2025'; } })(),
     // Incrementar este número cuando se reemplacen imágenes para forzar recarga (cache busting)
   ASSET_VERSION: 2
   };

@@ -8,15 +8,26 @@
 </head>
 <body>
   <header class="topbar">
-    <a href="../index.html" class="back">← Seguir comprando</a>
+    <a href="../index.html" class="back btn-back" id="btn-back-cart" aria-label="Ir a productos">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="18" height="18">
+        <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Productos</span>
+    </a>
     <h1>Carrito</h1>
   </header>
   <main class="container" id="main">
     <div id="estado" class="msg">Cargando...</div>
     <section id="carrito" style="display:none">
       <table class="tabla">
-        <thead>
-          <tr><th>Producto</th><th>Precio</th><th>Cant.</th><th>Subtotal</th><th></th></tr>
+        <thead class="head-chips">
+          <tr>
+            <th><span class="th-chip">Producto</span></th>
+            <th><span class="th-chip">Precio</span></th>
+            <th><span class="th-chip">Cant.</span></th>
+            <th><span class="th-chip">Subtotal</span></th>
+            <th></th>
+          </tr>
         </thead>
         <tbody id="tbody"></tbody>
       </table>
@@ -24,12 +35,47 @@
         <strong>Total: <span id="total"></span></strong>
       </div>
       <div class="acciones">
-        <button id="btn-vaciar" class="outline">Vaciar</button>
-        <button id="btn-checkout" class="primary" disabled>Pagar todo</button>
+        <button id="btn-vaciar" class="outline btn-pill btn-dark">Vaciar</button>
+        <button id="btn-checkout" class="primary btn-pill btn-dark" disabled>Pagar todo</button>
+  <a id="btn-whatsapp" class="btn-whatsapp" href="https://wa.me/3814751707?text=mi%20nombre%20de%20pedido%20es%20" target="_blank" rel="noopener" title="Compartir comprobante por WhatsApp">
+          <svg viewBox="0 0 32 32" aria-hidden="true" focusable="false" class="wa-icon">
+            <path fill="currentColor" d="M19.11 17.48c-.28-.14-1.64-.81-1.89-.9-.25-.09-.43-.14-.61.14-.18.28-.7.9-.86 1.08-.16.18-.32.2-.6.07-.28-.14-1.17-.43-2.22-1.37-.82-.73-1.38-1.63-1.55-1.91-.16-.28-.02-.43.12-.57.12-.12.28-.32.41-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.61-1.47-.84-2.02-.22-.52-.44-.45-.61-.46-.16-.01-.34-.01-.52-.01s-.48.07-.73.34c-.25.28-.96.94-.96 2.28 0 1.34.98 2.63 1.12 2.8.14.18 1.93 2.94 4.67 4.12.65.28 1.16.45 1.56.58.65.21 1.25.18 1.72.11.52-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.2-.52-.34zM16.02 3.2c-7.09 0-12.84 5.61-12.84 12.53 0 2.47.73 4.77 2 6.7L3.2 28.8l6.6-2.08c1.86 1.02 4 1.6 6.22 1.6 7.09 0 12.84-5.61 12.84-12.53S23.11 3.2 16.02 3.2zm0 22.78c-2.07 0-3.99-.62-5.59-1.68l-.4-.26-3.92 1.24 1.28-3.81-.26-.39c-1.15-1.73-1.82-3.8-1.82-5.96 0-5.98 4.96-10.83 11.06-10.83s11.06 4.85 11.06 10.83-4.96 10.83-11.06 10.83z"/>
+          </svg>
+          Compartir comprobante
+        </a>
       </div>
       <div id="checkout-msg" class="mini"></div>
     </section>
+
+    
   </main>
+  <footer class="footer" style="text-align:center;padding:12px 0;color:#6b7280;">
+    <small><a href="../legal.html">Privacidad y Cookies</a></small>
+  </footer>
+  <!-- Overlay de instrucciones de pago -->
+  <div id="instrucciones-overlay" class="instrucciones-overlay" aria-hidden="true">
+    <div class="instrucciones-panel" role="dialog" aria-labelledby="instr-title">
+      <header class="instr-header">
+        <h2 id="instr-title">INSTRUCCIONES</h2>
+        <button type="button" class="instr-close" aria-label="Cerrar">✕</button>
+      </header>
+      <div class="instr-body">
+        <div class="instr-form">
+          <label for="nombre-cliente">Tu nombre</label>
+          <input id="nombre-cliente" type="text" placeholder="Escribe tu nombre" autocomplete="name" />
+          <small>Usaremos tu nombre para verificar el comprobante.</small>
+        </div>
+        <ol class="instr-steps">
+          <li>Ingresa al link de pago.</li>
+          <li>Ingresa el monto de lo que pidió en la página.</li>
+          <li>Envía el dinero y saca captura de pantalla del comprobante.</li>
+          <li>Vuelve a la página y presiona el botón “Compartir comprobante”.</li>
+          <li>Envía el nombre con el que registró la compra y el comprobante.</li>
+        </ol>
+        <a class="instr-pay-link" href="https://link.mercadopago.com.ar/benditahamburguesa4" target="_blank" rel="noopener">Ir al link de pago</a>
+      </div>
+    </div>
+  </div>
   <script src="../config.js"></script>
   <script src="carrito.js"></script>
 </body>

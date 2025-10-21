@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Bendita Hamburguesa - Menú</title>
   <link rel="stylesheet" href="main.css?v=20251014" />
+  <link rel="stylesheet" href="theme-overrides.css?v=20251020" />
 </head>
 <body>
   <header class="site-header">
@@ -23,7 +24,7 @@
   <section class="hero">
     <div class="hero-inner">
       <h2>Hamburguesas,bebidas y combos irresistibles</h2>
-      <p>Elegí, personalizá y prepará tu pedido en Bendita Hamburguesa.</p>
+  <p>Elegí y disfrutá tu pedido en Bendita Hamburguesa.</p>
       <a class="hero-btn" href="#listado">Ver Menú</a>
     </div>
   </section>
@@ -42,6 +43,7 @@
         <option value="nombre-desc">Nombre Z-A</option>
       </select>
       <button id="limpiar" class="outline">Limpiar</button>
+      <button id="refrescar" class="outline" title="Actualizar catálogo">Actualizar</button>
     </div>
   </section>
 
@@ -55,8 +57,15 @@
 
   <div id="estado" class="estado-carga">Cargando productos...</div>
 
-  <footer class="footer">
-    <small>© <span id="year"></span> Bendita Hamburguesa </small>
+  
+
+  <footer class="footer" style="text-align:center;padding:12px 0;color:#6b7280;">
+    <small style="display:block;margin-bottom:6px;">© <span id="year"></span> Bendita Hamburguesa · <a href="legal.html">Privacidad y Cookies</a></small>
+    <small>
+      📍 Tucumán, Argentina ·
+      📧 <a href="mailto:benditahamburguesaemp@gmail.com" style="color:#fff;">benditahamburguesaemp@gmail.com</a> ·
+      📱 <a href="https://wa.me/3814751707" target="_blank" rel="noopener" title="WhatsApp" style="color:#fff;">WhatsApp</a>
+    </small>
   </footer>
 
   <template id="tpl-card">

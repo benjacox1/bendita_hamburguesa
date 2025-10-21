@@ -30,6 +30,7 @@ async function crearProducto(data){
 async function actualizarProducto(id, patch){
   const r = await fetch(`${API_BASE}/products/${id}`, { method:'PUT', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify(patch) });
   if(!r.ok){ alert('Error actualizando producto'); }
+  try { localStorage.setItem('catalog_updated_v1', String(Date.now())); } catch {}
 }
 async function eliminarProducto(id){
   if(!confirm('¿Eliminar producto?')) return;
@@ -37,6 +38,7 @@ async function eliminarProducto(id){
   if(!r.ok){ alert('Error eliminando'); return; }
   await cargarProductos();
   renderProductos();
+  try { localStorage.setItem('catalog_updated_v1', String(Date.now())); } catch {}
 }
 async function ajustarStock(id, delta){
   const p = productos.find(x=>x.id===id);
@@ -55,6 +57,7 @@ function estadoStock(p){
 
 function renderProductos(){
   tbodyStock.innerHTML='';
+  const v = Date.now(); // cache-busting para ver imágenes recién subidas
   let filtrado = productos;
   const f = filtroStock.value.trim().toLowerCase();
   if(f){
@@ -73,9 +76,9 @@ function renderProductos(){
   filtrado.forEach((p,i)=>{
     const est = estadoStock(p);
     const tr = document.createElement('tr');
-    tr.innerHTML = `
+   tr.innerHTML = `
       <td>${i+1}</td>
-         <td>${p.imagen?`<img src="${(window.APP_CONFIG?.BACKEND||'http://localhost:4000') + '/imagenes/' + encodeURIComponent((((p.imagen||'').replace(/^\\\/*/, '')).split('/').pop()))}" alt="${p.nombre}" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #29313b"/>`:''}</td>
+      <td>${p.imagen?`<img src="${(window.APP_CONFIG?.BACKEND||'http://localhost:4000') + '/imagenes/' + encodeURIComponent((((p.imagen||'').replace(/^\\\/*/, '')).split('/').pop()))}?v=${v}" alt="${p.nombre}" style="width:42px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #29313b"/>`:''}</td>
       <td>${p.nombre}</td>
       <td>${p.categoria||'-'}</td>
       <td>${Number(p.precio||0).toFixed(2)}</td>
@@ -121,10 +124,15 @@ if(formProducto){
       up.append('imagen', file);
       const r = await fetch(`${API_BASE}/products/${encodeURIComponent(nuevo.id)}/image`, { method:'POST', headers: { ...(window.getAdminAuthHeaders?.()||{}) }, body: up });
       if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Subida de imagen falló: '+err.error); }
+      else {
+        try { showToast('Imagen guardada correctamente'); } catch {}
+      }
     }
     formProducto.reset();
     await cargarProductos();
     renderProductos();
+    // Notificar a otras pestañas para refrescar catálogo
+    try { localStorage.setItem('catalog_updated_v1', String(Date.now())); } catch {}
   });
 }
 
@@ -138,6 +146,7 @@ if(btnLimpiarStock){
     }
     await cargarProductos();
     renderProductos();
+    try { localStorage.setItem('catalog_updated_v1', String(Date.now())); } catch {}
   });
 }
 

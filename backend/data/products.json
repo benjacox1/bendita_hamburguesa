@@ -6,7 +6,7 @@
     "precio": 1500,
     "categoria": "comida",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA SIMPLE.png",
-    "stock": 3
+    "stock": 99
   },
   {
     "id": "hamburguesa-doble",
@@ -15,7 +15,7 @@
     "precio": 2000,
     "categoria": "comida",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA DOBLE.png",
-    "stock": 3
+    "stock": 99
   },
   {
     "id": "lata-pepsi",
@@ -24,7 +24,7 @@
     "precio": 1200,
     "categoria": "bebida",
     "imagen": "IMAGENES COMIDA/LATA DE PEPSI.png",
-    "stock": 24
+    "stock": 96
   },
   {
     "id": "combo-simple-pepsi",
@@ -33,7 +33,7 @@
     "precio": 2000,
     "categoria": "combo",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA SIMPLE + LATA DE PEPSI.png",
-    "stock": 10
+    "stock": 99
   },
   {
     "id": "combo-doble-pepsi",
@@ -42,7 +42,7 @@
     "precio": 2800,
     "categoria": "combo",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA DOBLE + LATA DE PEPSI.png",
-    "stock": 5
+    "stock": 100
   },
   {
     "id": "pack-2-simples",
@@ -51,7 +51,7 @@
     "precio": 2500,
     "categoria": "promo",
     "imagen": "IMAGENES COMIDA/2 HAMBURGUESAS SIMPLES.png",
-    "stock": 12
+    "stock": 100
   },
   {
     "id": "pack-2-dobles",
@@ -60,7 +60,7 @@
     "precio": 3500,
     "categoria": "promo",
     "imagen": "IMAGENES COMIDA/2 HAMBURGUESAS DOBLES.png",
-    "stock": 6
+    "stock": 100
   },
   {
     "id": "pack-2-pepsi",
@@ -69,6 +69,16 @@
     "precio": 2000,
     "categoria": "promo",
     "imagen": "IMAGENES COMIDA/2 LATAS DE PEPSI.png",
-    "stock": 25
+    "stock": 100
+  },
+  {
+    "id": "botella-de-pepsi",
+    "nombre": "Botella De Pepsi",
+    "descripcion": "",
+    "precio": 2000,
+    "categoria": "bebida",
+    "imagen": "",
+    "stock": 24,
+    "stockMin": 5
   }
 ]

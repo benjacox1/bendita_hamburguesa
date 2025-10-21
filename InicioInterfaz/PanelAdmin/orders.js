@@ -2,15 +2,60 @@
 // Estados: espera -> preparando -> listo -> retirado
 // Ahora consume API REST en lugar de localStorage
 
+// Envolver todo en DOMContentLoaded para asegurar que el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+
 const API_BASE = (window.APP_CONFIG?.API_BASE) || 'http://localhost:4000/api';
 let pedidos = [];
 let pedidosPreviosMap = new Map(); // para detectar cambios en paymentStatus
+// Flag para evitar notificaciones sonoras en el primer render y detectar cambios
+let __adminInitialized = false;
 
 const formPedido = document.getElementById('form-nuevo-pedido');
 const tbodyPedidos = document.querySelector('#tabla-pedidos tbody');
 const filtroPedidos = document.getElementById('filtro-pedidos');
 const btnLimpiarPedidos = document.getElementById('limpiar-pedidos');
 const btnRefrescar = document.getElementById('refrescar-pedidos');
+const btnDiagnostico = document.getElementById('diagnostico-pedidos');
+
+console.log('[ORDERS.JS] DOM Ready - tbodyPedidos:', tbodyPedidos);
+console.log('[ORDERS.JS] Tabla encontrada:', !!tbodyPedidos);
+
+const statusBanner = (() => {
+  let el = document.getElementById('orders-status');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'orders-status';
+    el.style.cssText = 'margin:8px 0;padding:8px 12px;border-radius:6px;font-size:0.85rem;display:none;font-weight:600;';
+    const header = document.querySelector('#tab-pedidos h2');
+    if (header && header.parentElement) {
+      header.insertAdjacentElement('afterend', el);
+    } else {
+      document.body.insertBefore(el, document.body.firstChild);
+    }
+  }
+  return el;
+})();
+
+function showStatus(message, tone = 'info') {
+  if (!statusBanner) return;
+  if (!message) {
+    statusBanner.style.display = 'none';
+    statusBanner.textContent = '';
+    return;
+  }
+  const palette = {
+    info: ['#e0f2fe', '#0c4a6e'],
+    success: ['#dcfce7', '#166534'],
+    warn: ['#fef3c7', '#92400e'],
+    error: ['#fee2e2', '#b91c1c']
+  };
+  const [bg, fg] = palette[tone] || palette.info;
+  statusBanner.style.background = bg;
+  statusBanner.style.color = fg;
+  statusBanner.style.display = 'block';
+  statusBanner.textContent = message;
+}
 
 const estadosSecuenciales = ['espera','preparando','listo','retirado'];
 const etiquetasEstado = {
@@ -22,13 +67,54 @@ const etiquetasEstado = {
 
 async function cargarPedidos(){
   try {
-  const r = await fetch(API_BASE + '/orders', { cache:'no-store', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    pedidos = await r.json();
-  } catch(e){
-    console.error('[PEDIDOS] No se pudieron cargar pedidos:', e);
-    pedidos = [];
-  }
+    console.log('[PEDIDOS] API_BASE:', API_BASE);
+    
+    // No enviar headers de autenticación ya que el endpoint no lo requiere
+    const url = API_BASE + '/orders';
+    console.log('[PEDIDOS] URL completa:', url);
+    showStatus('Cargando pedidos...', 'info');
+
+    const r = await fetch(url, { cache:'no-store' });
+    console.log('[PEDIDOS] Response status:', r.status, r.statusText);
+
+    if (r.status === 401) {
+      console.error('[PEDIDOS] El backend rechazó la petición (401) - reintentando sin token.');
+      // Reintentar sin headers
+      const r2 = await fetch(url, { cache:'no-store', headers: {} });
+      if(!r2.ok) {
+        showStatus('No se pudieron cargar los pedidos. Error del servidor.', 'error');
+        pedidos = [];
+        return;
+      }
+      const data2 = await r2.json();
+      if(!Array.isArray(data2)){
+        showStatus('Respuesta inesperada del backend.', 'error');
+        pedidos = [];
+        return;
+      }
+      pedidos = data2;
+      window.__debugPedidos = pedidos;
+      console.log('[ADMIN PEDIDOS] Cargados (sin token):', pedidos.length, 'pedidos');
+      showStatus(`Pedidos cargados correctamente: ${pedidos.length}`, pedidos.length ? 'success' : 'info');
+      return;
+    }      if(!r.ok) throw new Error('HTTP '+r.status);
+      const data = await r.json();
+      if(!Array.isArray(data)){
+        console.error('[PEDIDOS] Respuesta inesperada (no es array):', data);
+        showStatus('Respuesta inesperada del backend al cargar pedidos.', 'error');
+        pedidos = [];
+        return;
+      }
+      pedidos = data;
+      window.__debugPedidos = pedidos;
+      console.log('[ADMIN PEDIDOS] Cargados:', pedidos.length, 'pedidos');
+      showStatus(`Pedidos cargados correctamente: ${pedidos.length}`, pedidos.length ? 'success' : 'info');
+    } catch(e){
+      console.error('[PEDIDOS] No se pudieron cargar pedidos:', e);
+      console.error('[PEDIDOS] Error completo:', e.message);
+      pedidos = [];
+      showStatus('No se pudieron cargar los pedidos. Revisa la consola para más detalles.', 'error');
+    }
 }
 
 async function crearPedidoManual(data){
@@ -53,18 +139,17 @@ async function crearPedidoManual(data){
 }
 
 async function cambiarEstado(id, nuevo){
-  const r = await fetch(`${API_BASE}/orders/${id}/state`, {
-    method:'PATCH', headers:{'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})}, body: JSON.stringify({ estado: nuevo })
-  });
-  if(!r.ok){ alert('Error cambiando estado'); return; }
+  const headers = { 'Content-Type':'application/json' };
+  const r = await fetch(`${API_BASE}/orders/${id}/state`, { method:'PATCH', headers, body: JSON.stringify({ estado: nuevo }) });
+  if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Error cambiando estado: ' + (err.error||r.status)); return; }
   await cargarPedidos();
   renderPedidos();
 }
 
 async function eliminarPedido(id){
   if(!confirm('Eliminar pedido?')) return;
-  const r = await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE', headers: { ...(window.getAdminAuthHeaders?.()||{}) } });
-  if(!r.ok){ alert('Error eliminando'); return; }
+  const r = await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE' });
+  if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Error eliminando: ' + (err.error||r.status)); return; }
   await cargarPedidos();
   renderPedidos();
 }
@@ -84,22 +169,66 @@ function crearBotonesEstados(p) {
 }
 
 function renderPedidos() {
-  tbodyPedidos.innerHTML='';
+  // Asegurar existencia de tbody (si falta, reinsertar estructura mínima)
+  let tbody = document.querySelector('#tabla-pedidos tbody');
+  if (!tbody) {
+    const sec = document.getElementById('tab-pedidos') || document.querySelector('main') || document.body;
+    let table = document.getElementById('tabla-pedidos');
+    if (!table) {
+      table = document.createElement('table');
+      table.id = 'tabla-pedidos';
+      table.className = 'tabla';
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>Items</th>
+            <th>Importe</th>
+            <th>Estado</th>
+            <th>Pago</th>
+            <th>Acciones</th>
+            <th>Creación</th>
+            <th>Eliminar</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+      const wrap = document.createElement('section');
+      wrap.className = 'card';
+      wrap.appendChild(table);
+      sec.appendChild(wrap);
+    }
+    tbody = table.querySelector('tbody');
+  }
+
+  // Render limpio: sin fila de prueba
+
+  //console.log('[RENDER] Iniciando render con', pedidos.length, 'pedidos totales');
+  tbody.innerHTML='';
   let filtrado = pedidos;
-  const f = filtroPedidos.value.trim().toLowerCase();
+  const f = filtroPedidos ? filtroPedidos.value.trim().toLowerCase() : '';
   if (f) {
     filtrado = pedidos.filter(p=>
+      (p.id||'').toLowerCase().includes(f) ||
       (p.cliente||'').toLowerCase().includes(f) ||
       p.items?.some(it => (it.nombre||'').toLowerCase().includes(f))
     );
   }
+  
+  //console.log('[RENDER] Total pedidos:', pedidos.length, 'Filtrados:', filtrado.length);
+  
   if (!filtrado.length) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
-  td.colSpan = 9;
+    td.colSpan = 9;
     td.innerHTML = '<div class="empty-msg">Sin pedidos por el momento.</div>';
-    tr.appendChild(td); tbodyPedidos.appendChild(tr); return;
+    tr.appendChild(td); tbody.appendChild(tr); return;
   }
+
+  // Flags para notificar una sola vez por render
+  let notifyNew = false;
+  let notifyPay = false;
 
   filtrado.forEach((p, i) => {
     const listaItems = (p.items||[]).map(it => `${it.nombre||it.productId} x${it.cantidad}`).join('<br>');
@@ -107,7 +236,8 @@ function renderPedidos() {
     const pay = p.paymentStatus || 'pending';
     const payColor = pay === 'approved' ? '#2ecc71' : (pay === 'rejected' ? '#e74c3c' : '#f1c40f');
     const previo = pedidosPreviosMap.get(p.id);
-    const changed = previo && previo !== pay;
+    const isNew = !pedidosPreviosMap.has(p.id) && __adminInitialized;
+    const changed = __adminInitialized && previo && previo !== pay;
     tr.innerHTML = `
       <td>${i+1}</td>
       <td>${p.cliente||''}</td>
@@ -122,17 +252,32 @@ function renderPedidos() {
     if(changed){
       tr.classList.add('pay-changed');
       setTimeout(()=> tr.classList.remove('pay-changed'), 4000);
+      notifyPay = true;
     }
+    if(isNew){ notifyNew = true; }
     pedidosPreviosMap.set(p.id, pay);
-    tbodyPedidos.appendChild(tr);
+    tbody.appendChild(tr);
     tr.querySelector('.td-acciones').appendChild(crearBotonesEstados(p));
   });
 
-  tbodyPedidos.querySelectorAll('button[data-del]').forEach(btn => {
+  // Eliminar entradas antiguas del mapa que ya no están
+  const currentIds = new Set(pedidos.map(p=>p.id));
+  for(const id of Array.from(pedidosPreviosMap.keys())){
+    if(!currentIds.has(id)) pedidosPreviosMap.delete(id);
+  }
+
+  tbody.querySelectorAll('button[data-del]').forEach(btn => {
     btn.addEventListener('click', () => eliminarPedido(btn.dataset.del));
   });
 
   updateDebug();
+
+  // Disparar sonidos (evitar primer render)
+  if(__adminInitialized){
+    if(notifyNew) playNotify('new');
+    else if(notifyPay) playNotify('payment');
+  }
+  __adminInitialized = true;
 }
 
 // Cache de productos para selector
@@ -199,6 +344,38 @@ if (btnLimpiarPedidos) {
   });
 }
 if (btnRefrescar) btnRefrescar.addEventListener('click', async () => { await cargarPedidos(); renderPedidos(); });
+
+// Diagnóstico rápido: verifica API_BASE, /health y /orders
+if (btnDiagnostico) {
+  btnDiagnostico.addEventListener('click', async () => {
+    try {
+      const base = API_BASE.replace(/\/$/, '');
+      showStatus('Ejecutando diagnóstico...', 'info');
+      const healthUrl = base + '/health';
+      const ordersUrl = base + '/orders';
+      const [h, o] = await Promise.allSettled([
+        fetch(healthUrl, { cache: 'no-store' }),
+        fetch(ordersUrl, { cache: 'no-store' })
+      ]);
+      let msg = `API: ${base} | `;
+      if (h.status === 'fulfilled') {
+        msg += `health ${h.value.status}`;
+      } else {
+        msg += `health error`;
+      }
+      msg += ' · ';
+      if (o.status === 'fulfilled') {
+        msg += `orders ${o.value.status}`;
+      } else {
+        msg += `orders error`;
+      }
+      showStatus(msg, (h.status==='fulfilled' && h.value.ok && o.status==='fulfilled' && o.value.ok) ? 'success' : 'warn');
+    } catch(e){
+      showStatus('Diagnóstico: error inesperado. Revisa consola.', 'error');
+      console.warn('[DIAG]', e);
+    }
+  });
+}
 
 // ================= Debug Panel Adaptado =================
 const debugToggle = document.getElementById('debug-toggle');
@@ -280,15 +457,34 @@ function sanitizeCSV(val){
 
 // Inicial
 (async function initAdmin(){
+  console.log('[INIT] Iniciando panel de administración...');
+  console.log('[INIT] tbodyPedidos existe:', !!tbodyPedidos);
+  console.log('[INIT] API_BASE:', API_BASE);
+  
   await Promise.all([cargarPedidos(), cargarProductosParaPedidos()]);
+  console.log('[INIT] Pedidos y productos cargados:', pedidos.length, 'pedidos');
+  
+  // Prefiltrar por query param ?q=
+  try {
+    const q = new URLSearchParams(location.search).get('q');
+    if (q && filtroPedidos) filtroPedidos.value = q;
+  } catch {}
+  
+  console.log('[INIT] Llamando a renderPedidos...');
   renderPedidos();
+  console.log('[INIT] Render completado');
+  
   poblarSelectorProductos();
   hookAutoCompletarPedido();
+  
   // Polling cada 10s
   setInterval(async ()=>{
+    console.log('[POLLING] Actualizando pedidos...');
     const old = new Map(pedidosPreviosMap); // copia para comparar
     await Promise.all([cargarPedidos(), cargarProductosParaPedidos()]);
     renderPedidos();
     // (La comparación se hace dentro de renderPedidos con pedidosPreviosMap)
   }, 10000);
 })();
+
+}); // Fin DOMContentLoaded

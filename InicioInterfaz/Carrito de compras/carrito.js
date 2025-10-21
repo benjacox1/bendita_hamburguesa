@@ -116,103 +116,112 @@ function initEventos(){
   document.getElementById('btn-vaciar').addEventListener('click', () => {
     if(confirm('Vaciar carrito?')){ guardarCarrito([]); render(); }
   });
-  document.getElementById('btn-checkout').addEventListener('click', async () => {
+  // Compartir comprobante por WhatsApp: crea pedido y abre chat
+  const btnWA = document.getElementById('btn-whatsapp');
+  if (btnWA) {
+    btnWA.addEventListener('click', async (e) => {
+      try { e.preventDefault(); } catch {}
+      const items = leerCarrito();
+      if (items.length === 0) {
+        alert('Tu carrito está vacío. Agrega productos antes de compartir comprobante.');
+        window.open(btnWA.href, '_blank');
+        return;
+      }
+      const nombre = (document.getElementById('nombre-cliente')?.value || '').trim();
+      if (!nombre) {
+        alert('Por favor ingresa tu nombre en el cuadro de texto antes de compartir el comprobante.');
+        document.getElementById('nombre-cliente')?.focus();
+        return;
+      }
+      const msg = document.getElementById('checkout-msg');
+      if (msg) { msg.textContent = 'Preparando pedido para verificación...'; msg.className = 'mini'; }
+      try {
+        const validation = await validarCarrito(items);
+        if (!validation.valid) {
+          const texto = 'Revisa tu carrito:\n\n' + (validation.errors||[]).join('\n');
+          alert(texto);
+          if (msg) { msg.textContent = 'Corrige el carrito antes de enviar comprobante.'; msg.classList.add('error'); }
+          return;
+        }
+        const pedido = await (async function crearPedidoConNombre(items, cliente){
+          const payload = {
+            cliente: cliente || '',
+            items: items.map(i => ({ productId: i.id, cantidad: i.cantidad }))
+          };
+          const resp = await fetch(API_BASE + '/orders', {
+            method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload)
+          });
+          if(!resp.ok){ const err = await resp.json().catch(()=>({error:'Error'})); throw new Error(err.error || 'Error creando pedido'); }
+          return resp.json();
+        })(items, nombre);
+        let url; try { url = new URL(btnWA.href); } catch { url = null; }
+        const existingText = url ? (url.searchParams.get('text') || '') : '';
+        const extra = `Pedido #${pedido.id} - Total $${Number(pedido.importe||0).toFixed(2)} - Nombre: ${nombre}`;
+        const finalText = existingText ? (existingText + extra) : extra;
+        let finalHref = btnWA.href;
+        if (url) { url.searchParams.set('text', finalText); finalHref = url.toString(); }
+        if (msg) { msg.textContent = `Pedido creado (#${pedido.id}) a nombre de ${nombre}. Ahora comparte tu comprobante por WhatsApp.`; msg.className = 'mini success'; }
+        const adminBase = (window.APP_CONFIG?.BACKEND) || 'http://localhost:4000';
+        const adminUrl = adminBase.replace(/\/$/, '') + '/PanelAdmin/index.html?q=' + encodeURIComponent(pedido.id);
+        try {
+          const toast = document.createElement('div');
+          toast.className = 'toast-pedido';
+          toast.innerHTML = `<strong>Pedido #${pedido.id}</strong><br>Nombre: ${nombre}<br>Total: $ ${Number(pedido.importe||0).toFixed(2)}<br><a href="${adminUrl}" target="_blank" rel="noopener" class="toast-link">Ver en Admin</a>`;
+          document.body.appendChild(toast);
+          setTimeout(()=> toast.classList.add('show'), 10);
+          setTimeout(()=> { toast.classList.remove('show'); setTimeout(()=> toast.remove(), 300); }, 4500);
+        } catch {}
+  try { guardarCarrito([]); render(); } catch {}
+  window.open(finalHref, '_blank');
+      } catch (err) {
+        console.warn('[WHATSAPP] No se pudo crear pedido, se abrirá chat igualmente:', err);
+        if (msg) { msg.textContent = 'No se pudo registrar el pedido automáticamente. Puedes enviar el comprobante por WhatsApp.'; msg.className = 'mini error'; }
+        window.open(btnWA.href, '_blank');
+      }
+    });
+  }
+  document.getElementById('btn-checkout').addEventListener('click', () => {
+    const items = leerCarrito();
     const msg = document.getElementById('checkout-msg');
     msg.className='mini';
-    const items = leerCarrito();
     if(items.length===0){ msg.textContent='Carrito vacío'; return; }
-    
-    msg.textContent='Validando carrito...';
-    try {
-      // Primero validar el carrito
-      const validation = await validarCarrito(items);
-      console.log('[CHECKOUT] validación carrito', validation);
-      
-      if (!validation.valid) {
-        msg.textContent = 'Errores en carrito: ' + validation.errors.join(', ');
-        msg.classList.add('error');
-        
-        // Mostrar errores detallados
-        if (validation.errors.length > 0) {
-          alert('Problemas con tu carrito:\n\n' + validation.errors.join('\n\n') + '\n\nPor favor revisa los productos y cantidades.');
-        }
-        return;
-      }
-      
-      msg.textContent = `Creando pedido (Total: $${validation.total.toFixed(2)})...`;
-      
-      const pedido = await crearPedidoBackend(items);
-      
-      // Validar que el total coincida
-      if (Math.abs(pedido.importe - validation.total) > 0.01) {
-        msg.textContent = 'Error: Los totales no coinciden';
-        msg.classList.add('error');
-        console.error('[CHECKOUT] Total mismatch', { backend: pedido.importe, frontend: validation.total });
-        return;
-      }
-      
-      if (paymentConfig?.provider === 'vexor') {
-        msg.textContent='Creando sesión de pago (Vexor)...';
-        const ses = await crearSesionVexor(pedido.id);
-        console.log('[CHECKOUT] sesión Vexor', ses);
-        if(!ses || !ses.checkout_url){
-          msg.textContent='No se recibió URL de pago Vexor';
-          msg.classList.add('error');
-          return;
-        }
-        msg.textContent = `Redirigiendo a pago Vexor (${ses.simulated ? 'SIMULADO' : 'REAL'})...`;
-        try {
-          sessionStorage.setItem(SS_LAST_ORDER, JSON.stringify({
-            orderId: pedido.id,
-            external_reference: 'vexor_'+pedido.id,
-            total: pedido.importe,
-            items_count: pedido.items.length,
-            created: Date.now(),
-            simulated: !!ses.simulated,
-            provider: 'vexor'
-          }));
-        } catch {}
-        setTimeout(()=>{ window.location.href = ses.checkout_url; }, 800);
-        msg.classList.add('success');
-        return;
-      } else {
-        msg.textContent='Generando preferencia de pago...';
-        const pref = await crearPreferencia(pedido.id);
-        console.log('[CHECKOUT] respuesta preferencia', pref);
-        if(!pref || !pref.init_point){
-          msg.textContent='No se recibió URL de pago del backend';
-          msg.classList.add('error');
-          return;
-        }
-        // Verificar datos de la preferencia
-        if (pref.total && Math.abs(pref.total - pedido.importe) > 0.01) {
-          msg.textContent = 'Error: Total de pago incorrecto';
-          msg.classList.add('error');
-          console.error('[CHECKOUT] Payment total mismatch', { preference: pref.total, order: pedido.importe });
-          return;
-        }
-        msg.textContent = `Redirigiendo a pago (${pref.simulated ? 'SIMULADO' : 'REAL'})...`;
-        try {
-          sessionStorage.setItem(SS_LAST_ORDER, JSON.stringify({
-            orderId: pedido.id,
-            external_reference: pref.external_reference,
-            total: pedido.importe,
-            items_count: pedido.items.length,
-            created: Date.now(),
-            simulated: pref.simulated,
-            provider: 'mercadopago'
-          }));
-        } catch {}
-        setTimeout(()=>{ window.location.href = pref.init_point; }, 800);
-        msg.classList.add('success');
-      }
-      
-    } catch(e){
-      console.error('[CHECKOUT] Error:', e);
-      msg.textContent='Error en checkout: '+e.message;
-      msg.classList.add('error');
+    // Mostrar overlay de instrucciones
+    const ov = document.getElementById('instrucciones-overlay');
+    if(ov){ ov.classList.add('show'); }
+  });
+  // Cerrar overlay
+  document.querySelector('.instr-close')?.addEventListener('click', ()=>{
+    document.getElementById('instrucciones-overlay')?.classList.remove('show');
+  });
+  document.getElementById('instrucciones-overlay')?.addEventListener('click', (e)=>{
+    if(e.target.id==='instrucciones-overlay'){
+      e.currentTarget.classList.remove('show');
     }
   });
+  // Interceptar "Ir al link de pago" para intentar prellenar monto y nombre
+  const payLink = document.querySelector('.instr-pay-link');
+  if (payLink) {
+    payLink.addEventListener('click', (e) => {
+      try { e.preventDefault(); } catch {}
+      const items = leerCarrito();
+      if (!items.length) { alert('Tu carrito está vacío.'); return; }
+      const nombre = (document.getElementById('nombre-cliente')?.value || '').trim();
+      if (!nombre) {
+        alert('Por favor ingresa tu nombre antes de ir al link de pago.');
+        document.getElementById('nombre-cliente')?.focus();
+        return;
+      }
+      const total = items.reduce((acc, it) => acc + (Number(it.precio)||0) * (Number(it.cantidad)||0), 0);
+      let url; try { url = new URL(payLink.href); } catch { url = null; }
+      let finalHref = payLink.href;
+      if (url) {
+        url.searchParams.set('amount', total.toFixed(2));
+        url.searchParams.set('name', nombre);
+        finalHref = url.toString();
+      }
+      window.open(finalHref, '_blank');
+    });
+  }
 }
 
 function checkPaymentReturn() {

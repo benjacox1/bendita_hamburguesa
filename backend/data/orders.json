@@ -1,88 +1,73 @@
 [
   {
-    "id": "XEYmn4-n",
-    "fechaCreacion": 1759883934911,
-    "estado": "espera",
-    "cliente": "",
+    "id": "UfW9k3CR",
+    "fechaCreacion": 1760573361815,
+    "estado": "retirado",
+    "cliente": "benjamin",
     "items": [
       {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
+        "productId": "lata-pepsi",
+        "nombre": "Lata de Pepsi",
+        "precioUnitario": 1200,
         "cantidad": 1,
-        "subtotal": 3400
+        "subtotal": 1200
       }
     ],
-    "importe": 3400,
+    "importe": 1200,
     "paymentStatus": "pending",
-    "externalReference": "ref_XEYmn4-n"
+    "externalReference": null,
+    "fechaCambio": 1760574015414
   },
   {
-    "id": "WsjLlmKo",
-    "fechaCreacion": 1759940136270,
-    "estado": "espera",
-    "cliente": "",
+    "id": "_oEiUoNk",
+    "fechaCreacion": 1760575638194,
+    "estado": "retirado",
+    "cliente": "Erik Benjamin Burgos",
     "items": [
       {
-        "productId": "combo-doble-pepsi",
-        "nombre": "Combo Hamburguesa Doble + Pepsi",
-        "precioUnitario": 4200,
-        "cantidad": 3,
-        "subtotal": 12600
+        "productId": "lata-pepsi",
+        "nombre": "Lata de Pepsi",
+        "precioUnitario": 1200,
+        "cantidad": 1,
+        "subtotal": 1200
       },
       {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
+        "productId": "combo-simple-pepsi",
+        "nombre": "Combo Hamburguesa Simple + Pepsi",
+        "precioUnitario": 2000,
         "cantidad": 1,
-        "subtotal": 3400
+        "subtotal": 2000
       }
     ],
-    "importe": 16000,
+    "importe": 3200,
     "paymentStatus": "pending",
-    "externalReference": null
+    "externalReference": null,
+    "fechaCambio": 1760986281709
   },
   {
-    "id": "Q6b-lBNp",
-    "fechaCreacion": 1759940143746,
-    "estado": "espera",
-    "cliente": "",
+    "id": "gqfPo-Fx",
+    "fechaCreacion": 1760579142385,
+    "estado": "retirado",
+    "cliente": "Erik Benjamin Burgos",
     "items": [
       {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
+        "productId": "hamburguesa-simple",
+        "nombre": "Hamburguesa Simple",
+        "precioUnitario": 1500,
         "cantidad": 1,
-        "subtotal": 3400
+        "subtotal": 1500
       }
     ],
-    "importe": 3400,
+    "importe": 1500,
     "paymentStatus": "pending",
-    "externalReference": "ref_Q6b-lBNp"
+    "externalReference": null,
+    "fechaCambio": 1760986280686
   },
   {
-    "id": "GB1pjrqL",
-    "fechaCreacion": 1759940145657,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_GB1pjrqL"
-  },
-  {
-    "id": "L4nOwXp0",
-    "fechaCreacion": 1759954852506,
-    "estado": "espera",
-    "cliente": "",
+    "id": "1bpCN0ta",
+    "fechaCreacion": 1760985609840,
+    "estado": "retirado",
+    "cliente": "Erik Benjamin Burgos",
     "items": [
       {
         "productId": "lata-pepsi",
@@ -94,618 +79,26 @@
     ],
     "importe": 1200,
     "paymentStatus": "pending",
-    "externalReference": "ref_L4nOwXp0"
+    "externalReference": null,
+    "fechaCambio": 1760986279874
   },
   {
-    "id": "0ifTa39j",
-    "fechaCreacion": 1759954920994,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_0ifTa39j"
-  },
-  {
-    "id": "jKV9NS4E",
-    "fechaCreacion": 1759954923765,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_jKV9NS4E"
-  },
-  {
-    "id": "kX7gDALC",
-    "fechaCreacion": 1759955701057,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_kX7gDALC"
-  },
-  {
-    "id": "9j2URXPo",
-    "fechaCreacion": 1759955708490,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_9j2URXPo"
-  },
-  {
-    "id": "Wz3wTB1X",
-    "fechaCreacion": 1759955932973,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_Wz3wTB1X"
-  },
-  {
-    "id": "rho7rRWX",
-    "fechaCreacion": 1759955934718,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_rho7rRWX"
-  },
-  {
-    "id": "4FfONdlb",
-    "fechaCreacion": 1759955935827,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_4FfONdlb"
-  },
-  {
-    "id": "CTuYz7bC",
-    "fechaCreacion": 1759955936986,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_CTuYz7bC"
-  },
-  {
-    "id": "Ty2nNu3l",
-    "fechaCreacion": 1759955937946,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_Ty2nNu3l"
-  },
-  {
-    "id": "mpBIa5ay",
-    "fechaCreacion": 1759955939041,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_mpBIa5ay"
-  },
-  {
-    "id": "S3DKbeRY",
-    "fechaCreacion": 1759955939926,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_S3DKbeRY"
-  },
-  {
-    "id": "R4Ib9s_N",
-    "fechaCreacion": 1759955940856,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_R4Ib9s_N"
-  },
-  {
-    "id": "4qWf5rYg",
-    "fechaCreacion": 1759955942088,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_4qWf5rYg"
-  },
-  {
-    "id": "Tv-uLLyy",
-    "fechaCreacion": 1759955943509,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "lata-pepsi",
-        "nombre": "Lata de Pepsi",
-        "precioUnitario": 1200,
-        "cantidad": 1,
-        "subtotal": 1200
-      }
-    ],
-    "importe": 1200,
-    "paymentStatus": "pending",
-    "externalReference": "ref_Tv-uLLyy"
-  },
-  {
-    "id": "1z8gMHGi",
-    "fechaCreacion": 1759956112588,
-    "estado": "espera",
-    "cliente": "",
+    "id": "l1joYSBe",
+    "fechaCreacion": 1760986274192,
+    "estado": "retirado",
+    "cliente": "benjamin",
     "items": [
       {
         "productId": "hamburguesa-doble",
         "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
+        "precioUnitario": 2000,
         "cantidad": 1,
-        "subtotal": 3400
+        "subtotal": 2000
       }
     ],
-    "importe": 3400,
+    "importe": 2000,
     "paymentStatus": "pending",
-    "externalReference": "ref_1z8gMHGi"
-  },
-  {
-    "id": "xFDZiY_A",
-    "fechaCreacion": 1759956114937,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_xFDZiY_A"
-  },
-  {
-    "id": "xYp2Y1hG",
-    "fechaCreacion": 1759956116325,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_xYp2Y1hG"
-  },
-  {
-    "id": "VhIKpBPK",
-    "fechaCreacion": 1759956334194,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_VhIKpBPK"
-  },
-  {
-    "id": "YlD3169s",
-    "fechaCreacion": 1759956361421,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_YlD3169s"
-  },
-  {
-    "id": "BI0psq_Q",
-    "fechaCreacion": 1759956395850,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_BI0psq_Q"
-  },
-  {
-    "id": "b2k6Ku0a",
-    "fechaCreacion": 1759956401589,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_b2k6Ku0a"
-  },
-  {
-    "id": "8FhH6l4d",
-    "fechaCreacion": 1759956425217,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-doble",
-        "nombre": "Hamburguesa Doble",
-        "precioUnitario": 3400,
-        "cantidad": 1,
-        "subtotal": 3400
-      }
-    ],
-    "importe": 3400,
-    "paymentStatus": "pending",
-    "externalReference": "ref_8FhH6l4d"
-  },
-  {
-    "id": "t5YJeY5v",
-    "fechaCreacion": 1759956564703,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_t5YJeY5v"
-  },
-  {
-    "id": "b6rRqXx6",
-    "fechaCreacion": 1759956576614,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T20:49:36.608Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_b6rRqXx6"
-  },
-  {
-    "id": "zHR07MAG",
-    "fechaCreacion": 1759956585673,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T20:49:45.667Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_zHR07MAG"
-  },
-  {
-    "id": "6Q769vaQ",
-    "fechaCreacion": 1759957433539,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:03:53.452Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_6Q769vaQ"
-  },
-  {
-    "id": "KEhbfYRB",
-    "fechaCreacion": 1759957527243,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:05:27.226Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_KEhbfYRB"
-  },
-  {
-    "id": "NYeUjzfe",
-    "fechaCreacion": 1759957533130,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:05:33.124Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_NYeUjzfe"
-  },
-  {
-    "id": "K_ZsvzgB",
-    "fechaCreacion": 1759957542499,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:05:42.490Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_K_ZsvzgB"
-  },
-  {
-    "id": "oTSgdufr",
-    "fechaCreacion": 1759957602603,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:06:42.595Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_oTSgdufr"
-  },
-  {
-    "id": "ewlVXlc4",
-    "fechaCreacion": 1759959332355,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:35:32.322Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_ewlVXlc4"
-  },
-  {
-    "id": "xf_GRnwv",
-    "fechaCreacion": 1759959560771,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:39:20.773Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_xf_GRnwv"
-  },
-  {
-    "id": "6Dw2ABIc",
-    "fechaCreacion": 1759960527582,
-    "estado": "espera",
-    "cliente": "FlowVerify 2025-10-08T21:55:27.577Z",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_6Dw2ABIc"
-  },
-  {
-    "id": "R0C0TfSh",
-    "fechaCreacion": 1759960576544,
-    "estado": "espera",
-    "cliente": "",
-    "items": [
-      {
-        "productId": "hamburguesa-simple",
-        "nombre": "Hamburguesa Simple",
-        "precioUnitario": 2500,
-        "cantidad": 1,
-        "subtotal": 2500
-      }
-    ],
-    "importe": 2500,
-    "paymentStatus": "pending",
-    "externalReference": "ref_R0C0TfSh"
+    "externalReference": null,
+    "fechaCambio": 1760986278753
   }
 ]

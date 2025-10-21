@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Información Legal – Bendita Hamburguesa</title>
+  <link rel="stylesheet" href="main.css" />
+  <style>
+    body { max-width: 1000px; margin: 0 auto; padding: 1rem; font-family: system-ui, Arial, sans-serif; color:#000; background:#fff; }
+    header { display:flex; align-items:center; gap:.75rem; margin-bottom:1rem; }
+    header a { text-decoration:none; color:#1e40af; font-weight:600; }
+    h1 { margin: .5rem 0 1rem; font-size:1.6rem; }
+    nav.anchors { display:flex; flex-wrap:wrap; gap:.5rem; margin: 0 0 1rem; }
+    nav.anchors a { background:#eef2ff; color:#1e40af; padding:.4rem .6rem; border-radius:999px; font-size:.85rem; text-decoration:none; }
+    section { background:#ffffff; padding:1rem 1.25rem; border-radius:10px; box-shadow:0 2px 4px rgba(0,0,0,.06); margin-bottom:1rem; color:#000; }
+    section h2 { margin-top:0; }
+    .muted { color:#6b7280; font-size:.85rem; }
+    /* Botón volver pill */
+    .btn-back{display:inline-flex;align-items:center;gap:.45rem;background:#f3f4f6;border:1px solid #d1d5db;padding:.45rem .7rem;border-radius:999px;color:#111827;text-decoration:none}
+    .btn-back:hover{background:#e5e7eb;border-color:#cbd5e1}
+    .btn-back .ico{opacity:.8}
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" class="btn-back" aria-label="Volver al inicio">
+      <svg class="ico" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="18" height="18">
+        <path d="M15 19L8 12L15 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span>Volver</span>
+    </a>
+    <h1>Información Legal</h1>
+  </header>
+  <nav class="anchors">
+    <a href="#privacidad">Política de Privacidad</a>
+    <a href="#cookies">Política de Cookies</a>
+    <a href="#terminos">Términos y Condiciones</a>
+  </nav>
+
+  <section id="privacidad">
+    <h2>Política de Privacidad – Bendita Hamburguesa</h2>
+    <p>En Bendita Hamburguesa respetamos y protegemos tus datos personales. Cuando realizás un pedido o nos contactás, te pedimos información básica (como nombre, teléfono, correo o dirección) solo para poder procesar tu compra o responderte.</p>
+    <p>Tus datos no se venden ni se comparten con terceros, salvo con servicios necesarios para completar tu pedido (por ejemplo, MercadoPago o servicios de mensajería).</p>
+    <p>Podés solicitar la eliminación o modificación de tus datos en cualquier momento escribiendo a: <strong>benditahamburguesaemp@gmail.com</strong>.</p>
+    <p>Cumplimos con la Ley N° 25.326 de Protección de Datos Personales de la República Argentina.</p>
+  </section>
+
+  <section id="cookies">
+    <h2>Política de Cookies – Bendita Hamburguesa</h2>
+    <p>Esta web utiliza cookies propias y de terceros para mejorar tu experiencia de navegación y analizar el tráfico del sitio.</p>
+    <p>Podés configurar o rechazar el uso de cookies desde tu navegador. Al continuar navegando, entendemos que aceptás nuestra política de cookies.</p>
+    <p>Si querés más información, escribinos a <strong>benditahamburguesaemp@gmail.com</strong>.</p>
+  </section>
+
+  <section id="terminos">
+    <h2>Términos y Condiciones – Bendita Hamburguesa</h2>
+    <ul>
+      <li>Todos los precios están expresados en pesos argentinos (ARS) e incluyen impuestos.</li>
+      <li>Los pedidos se confirman únicamente cuando el pago es aprobado por MercadoPago.</li>
+      <li>Las imágenes son ilustrativas.</li>
+      <li>Los productos pueden variar según disponibilidad.</li>
+      <li>Si necesitás cancelar o modificar tu pedido, escribinos lo antes posible por WhatsApp o al correo <strong>benditahamburguesaemp@gmail.com</strong>.</li>
+    </ul>
+  </section>
+
+  <p class="muted">© <span id="year"></span> Bendita Hamburguesa</p>
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
