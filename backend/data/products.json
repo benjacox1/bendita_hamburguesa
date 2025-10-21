@@ -80,5 +80,15 @@
   "imagen": "IMAGENES COMIDA/BOTELLA DE PEPSI.png",
   "stock": 24,
   "stockMin": 5
+  },
+  {
+  "id": "combo-simple-botella-pepsi",
+  "nombre": "Combo Hamburguesa Simple + Botella de Pepsi",
+  "descripcion": "refresco de 500ml par acompañar una rica hamburguesa",
+  "precio": 3000,
+  "categoria": "combo",
+  "imagen": "IMAGENES COMIDA/BOTELLA DE PEPSI + HAMBURGUESA SIMPLE.png",
+  "stock": 19,
+  "stockMin": 5
   }
 ]
