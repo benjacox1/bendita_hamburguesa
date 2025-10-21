@@ -154,22 +154,39 @@ async function init(){
     node.getElementById('prod-descripcion').textContent = prod.descripcion || '';
     node.getElementById('prod-precio').textContent = formatearPrecio(prod.precio);
     node.getElementById('prod-categoria').textContent = prod.categoria;
+    // Mostrar estado de stock
+    const stockEl = node.getElementById('prod-stock');
+    if(stockEl){
+      if((prod.stock||0) === 0){
+        stockEl.textContent = 'Sin stock';
+        stockEl.classList.add('stock-cero');
+      } else {
+        stockEl.textContent = 'Disponible';
+        stockEl.classList.remove('stock-cero');
+      }
+    }
     document.getElementById('titulo-prod').textContent = prod.nombre + (modoFallback? ' (solo lectura)' : '');
     cont.appendChild(node);
     const form = document.getElementById('form-agregar');
     const resultado = document.getElementById('resultado');
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-      const datos = Object.fromEntries(new FormData(form).entries());
-      const cantidad = parseInt(datos.cantidad || '1');
-      if(cantidad <= 0){ resultado.textContent = 'Cantidad inválida'; resultado.classList.add('error'); return; }
-      resultado.classList.remove('error');
-      agregarAlCarrito(prod, cantidad);
-      resultado.textContent = 'Agregado al carrito ('+cantidad+')';
-      actualizarContador();
-      toggleMiniCart(true);
-      form.reset();
-    });
+    if((prod.stock||0) === 0){
+      form.querySelector('button[type="submit"]').disabled = true;
+      resultado.textContent = 'Este producto no cuenta con stock.';
+      resultado.classList.add('error');
+    } else {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const datos = Object.fromEntries(new FormData(form).entries());
+        const cantidad = parseInt(datos.cantidad || '1');
+        if(cantidad <= 0){ resultado.textContent = 'Cantidad inválida'; resultado.classList.add('error'); return; }
+        resultado.classList.remove('error');
+        agregarAlCarrito(prod, cantidad);
+        resultado.textContent = 'Agregado al carrito ('+cantidad+')';
+        actualizarContador();
+        toggleMiniCart(true);
+        form.reset();
+      });
+    }
     actualizarContador();
     // toggle desde el botón del header en detalle
     document.getElementById('btn-cart-det')?.addEventListener('click', (e)=>{ e.preventDefault(); toggleMiniCart(); });
