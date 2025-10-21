@@ -239,7 +239,7 @@ async function crearPedidoManual(data){
   renderPedidos();
 }
 async function cambiarEstado(id, nuevo){
-  const headers = {'Content-Type':'application/json'};
+  const headers = {'Content-Type':'application/json', ...(window.getAdminAuthHeaders?.()||{})};
   const r = await fetch(`${API_BASE}/orders/${id}/state`, { method:'PATCH', headers, body: JSON.stringify({ estado: nuevo }) });
   if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Error cambiando estado: ' + (err.error||r.status)); return; }
   await cargarPedidos();
@@ -247,7 +247,8 @@ async function cambiarEstado(id, nuevo){
 }
 
 async function eliminarPedido(id){
-  const r = await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE' });
+  const headers = {...(window.getAdminAuthHeaders?.()||{})};
+  const r = await fetch(`${API_BASE}/orders/${id}`, { method:'DELETE', headers });
   if(!r.ok){ const err = await r.json().catch(()=>({error:'Error'})); alert('Error eliminando: ' + (err.error||r.status)); return; }
   await cargarPedidos();
   renderPedidos();
