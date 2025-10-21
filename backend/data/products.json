@@ -6,7 +6,7 @@
   "precio": 2000,
     "categoria": "comida",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA SIMPLE.png",
-    "stock": 99
+    "stock": 30
   },
   {
   "id": "hamburguesa-doble",
@@ -15,7 +15,7 @@
   "precio": 2600,
     "categoria": "comida",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA DOBLE.png",
-    "stock": 99
+    "stock": 30
   },
   {
   "id": "lata-pepsi",
@@ -24,7 +24,7 @@
     "precio": 1200,
     "categoria": "bebida",
     "imagen": "IMAGENES COMIDA/LATA DE PEPSI.png",
-    "stock": 96
+    "stock": 0
   },
   {
     "id": "combo-simple-pepsi",
@@ -33,7 +33,7 @@
     "precio": 2000,
     "categoria": "combo",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA SIMPLE + LATA DE PEPSI.png",
-    "stock": 99
+    "stock": 0
   },
   {
     "id": "combo-doble-pepsi",
@@ -42,7 +42,7 @@
     "precio": 2800,
     "categoria": "combo",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA DOBLE + LATA DE PEPSI.png",
-    "stock": 100
+    "stock": 0
   },
   {
     "id": "pack-2-simples",
@@ -51,7 +51,7 @@
     "precio": 2500,
     "categoria": "promo",
     "imagen": "IMAGENES COMIDA/2 HAMBURGUESAS SIMPLES.png",
-    "stock": 100
+    "stock": 20
   },
   {
     "id": "pack-2-dobles",
@@ -60,7 +60,7 @@
     "precio": 3500,
     "categoria": "promo",
     "imagen": "IMAGENES COMIDA/2 HAMBURGUESAS DOBLES.png",
-    "stock": 100
+    "stock": 15
   },
   {
     "id": "pack-2-pepsi",
@@ -69,7 +69,7 @@
     "precio": 2000,
     "categoria": "promo",
     "imagen": "IMAGENES COMIDA/2 LATAS DE PEPSI.png",
-    "stock": 100
+    "stock": 0
   },
   {
   "id": "botella-de-pepsi",
@@ -78,7 +78,17 @@
   "precio": 1500,
   "categoria": "bebida",
   "imagen": "IMAGENES COMIDA/BOTELLA DE PEPSI.png",
-  "stock": 24,
+  "stock": 20,
+  "stockMin": 5
+  },
+  {
+  "id": "combo-simple-botella-pepsi",
+  "nombre": "Combo Hamburguesa Simple + Botella de Pepsi",
+  "descripcion": "refresco de 500ml par acompañar una rica hamburguesa",
+  "precio": 3000,
+  "categoria": "combo",
+  "imagen": "IMAGENES COMIDA/BOTELLA DE PEPSI + HAMBURGUESA SIMPLE.png",
+  "stock": 15,
   "stockMin": 5
   }
 ]
