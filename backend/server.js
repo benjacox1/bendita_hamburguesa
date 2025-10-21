@@ -1069,7 +1069,7 @@ app.get('/detalle-productos/producto.html', (req,res)=>{
   res.sendFile(path.join(FRONT_DIR, 'detalle-productos', 'producto.html'));
 });
 
-app.listen(PORT, '127.0.0.1', () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log('Backend escuchando en puerto', PORT);
   console.log('Sirviendo frontend estático desde', FRONT_DIR);
 });
