@@ -1,26 +1,26 @@
 [
   {
-    "id": "hamburguesa-simple",
-    "nombre": "Hamburguesa Simple",
-    "descripcion": "Pan suave, carne 100% res, queso, lechuga y tomate fresco.",
-    "precio": 1500,
+  "id": "hamburguesa-simple",
+  "nombre": "Hamburguesa Simple",
+  "descripcion": "pan suave,carne,lechuga,tomate y aderezos.",
+  "precio": 2000,
     "categoria": "comida",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA SIMPLE.png",
     "stock": 99
   },
   {
-    "id": "hamburguesa-doble",
-    "nombre": "Hamburguesa Doble",
-    "descripcion": "Doble carne, doble queso, vegetales frescos y salsa especial.",
-    "precio": 2000,
+  "id": "hamburguesa-doble",
+  "nombre": "Hamburguesa Doble",
+  "descripcion": "doble carne,tomate,lecha y aderezos.",
+  "precio": 2600,
     "categoria": "comida",
     "imagen": "IMAGENES COMIDA/HAMBURGUESA DOBLE.png",
     "stock": 99
   },
   {
-    "id": "lata-pepsi",
-    "nombre": "Lata de Pepsi",
-    "descripcion": "Refresco cola bien frío 354ml.",
+  "id": "lata-pepsi",
+  "nombre": "Lata de Pepsi",
+  "descripcion": "refresco bien frio de 354ml",
     "precio": 1200,
     "categoria": "bebida",
     "imagen": "IMAGENES COMIDA/LATA DE PEPSI.png",
@@ -72,13 +72,13 @@
     "stock": 100
   },
   {
-    "id": "botella-de-pepsi",
-    "nombre": "Botella De Pepsi",
-    "descripcion": "",
-    "precio": 2000,
-    "categoria": "bebida",
-    "imagen": "",
-    "stock": 24,
-    "stockMin": 5
+  "id": "botella-de-pepsi",
+  "nombre": "Botella De Pepsi",
+  "descripcion": "refresco bien frio de 500ml",
+  "precio": 1500,
+  "categoria": "bebida",
+  "imagen": "IMAGENES COMIDA/BOTELLA DE PEPSI.png",
+  "stock": 24,
+  "stockMin": 5
   }
 ]
