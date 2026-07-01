@@ -19,6 +19,7 @@
     <nav>
       <button class="tab-button active" data-tab="pedidos">Pedidos</button>
       <button class="tab-button" data-tab="stock">Stock Productos</button>
+      <button class="tab-button" data-tab="usuarios">Usuarios</button>
       <button id="logout-btn" class="tab-button" style="margin-left:auto;background:#ef4444;color:#fff;">Salir</button>
     </nav>
   </header>
@@ -146,6 +147,25 @@
         </tbody>
       </table>
     </section>
+
+    <section id="tab-usuarios" class="tab-section">
+      <h2>Usuarios del Panel</h2>
+      <div class="card">
+        <p>Los usuarios nuevos aparecerán aquí y deberán ser aprobados por el administrador.</p>
+        <table class="tabla" id="tabla-usuarios">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Estado</th>
+              <th>Rol</th>
+              <th>Creado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <footer>
@@ -173,6 +193,7 @@
   <script src="tabs.js?v=20251020"></script>
   <script src="orders.js?v=20251020"></script>
   <script src="stock.js?v=20251020"></script>
+  <script src="users.js?v=20251020"></script>
   <script>
     // Logout
     const logoutBtn = document.getElementById('logout-btn');

@@ -12,8 +12,11 @@
     .login-wrap input { width:100%; padding:10px 12px; border-radius:8px; border:1px solid #374151; background:#0b1220; color:#e5e7eb; }
     .login-wrap button { width:100%; margin-top:14px; padding:10px 12px; border:none; border-radius:8px; background:#10b981; color:#0b1220; font-weight:700; cursor:pointer; }
     .login-wrap .error { color:#fecaca; background:#7f1d1d; border:1px solid #dc2626; padding:8px 10px; border-radius:8px; display:none; margin-top:10px; }
+    .login-wrap .success { color:#dcfce7; background:#14532d; border:1px solid #22c55e; padding:8px 10px; border-radius:8px; display:none; margin-top:10px; }
+    .login-wrap .divider { margin:18px 0 8px; color:#9ca3af; text-align:center; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
     .login-wrap small { color:#9ca3af; display:block; margin-top:10px; text-align:center; }
   </style>
+  <script src="../config.js"></script>
   <script src="auth.js?v=20251014"></script>
 </head>
 <body>
@@ -26,6 +29,17 @@
       <input id="pass" type="password" autocomplete="current-password" placeholder="••••••••" />
       <button type="submit">Ingresar</button>
       <div id="err" class="error"></div>
+    </form>
+
+    <div class="divider">o</div>
+
+    <form id="register-form">
+      <label>Crear cuenta nueva</label>
+      <input id="reg-user" autocomplete="username" placeholder="nuevo-usuario" />
+      <label>Contraseña</label>
+      <input id="reg-pass" type="password" autocomplete="new-password" placeholder="••••••••" />
+      <button type="submit">Solicitar acceso</button>
+      <div id="reg-msg" class="success"></div>
     </form>
   </div>
   <script src="login.js?v=20251014"></script>
