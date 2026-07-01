@@ -10,6 +10,8 @@ import { logApp, logWebhook } from './logger.js';
 import { existsSync, createReadStream, mkdirSync } from 'fs';
 import multer from 'multer';
 import sharp from 'sharp';
+import { migrate, createPendingUser, findUserByUsername, verifyUserPassword, listUsers, approveUser, rejectUser, findUserById } from './migrate.js';
+import { signToken, verifyToken, authenticateToken, authorizeAdmin } from './auth.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -27,11 +29,21 @@ const PORT = cliPortArg ? Number(cliPortArg) : (process.env.PORT || 4000);
 // Base dinámica usada como fallback cuando no se proveen variables MP_BACK_*
 const dynamicBase = `http://localhost:${PORT}`;
 
-// Admin auth: token simple para proteger endpoints sensibles
+// Admin auth: acepta token JWT del sistema nuevo y el token legacy del panel
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'bh-admin-2025';
-function requireAdmin(req, res, next){
+async function requireAdmin(req, res, next){
   const auth = req.headers['authorization'] || '';
   if (auth === `Bearer ${ADMIN_TOKEN}`) return next();
+  if (auth.startsWith('Bearer ')) {
+    const token = auth.slice(7);
+    try {
+      const payload = await verifyToken(token);
+      if (payload?.isAdmin) {
+        req.user = payload;
+        return next();
+      }
+    } catch {}
+  }
   return res.status(401).json({ error: 'Unauthorized' });
 }
 
@@ -358,6 +370,77 @@ app.get('/api/stats', async (req, res) => {
 // Healthcheck simple
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, time: Date.now() });
+});
+
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { username, password } = req.body || {};
+    const created = await createPendingUser(username, password);
+    res.status(201).json({ ok: true, message: 'Solicitud creada. Espera aprobación del administrador.', user: created });
+  } catch (e) {
+    res.status(400).json({ error: e.message || 'No se pudo crear la cuenta' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body || {};
+    const user = await findUserByUsername(username);
+    if (!user) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    if (!user.is_approved) return res.status(403).json({ error: 'La cuenta aún no fue aprobada por el administrador' });
+    const ok = await verifyUserPassword(password, user.password_hash);
+    if (!ok) return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
+    const token = signToken({ userId: user.id, username: user.username, isAdmin: Boolean(user.is_admin) });
+    res.json({
+      ok: true,
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        isAdmin: Boolean(user.is_admin),
+        isApproved: Boolean(user.is_approved)
+      }
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Error iniciando sesión', detail: e.message });
+  }
+});
+
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+  try {
+    const user = await findUserById(req.user.userId);
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+    res.json({ user: { id: user.id, username: user.username, isAdmin: Boolean(user.is_admin), isApproved: Boolean(user.is_approved) } });
+  } catch (e) {
+    res.status(500).json({ error: 'Error obteniendo usuario', detail: e.message });
+  }
+});
+
+app.get('/api/auth/users', authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const users = await listUsers();
+    res.json({ users: users.map(u => ({ id: u.id, username: u.username, isAdmin: Boolean(u.is_admin), isApproved: Boolean(u.is_approved), createdAt: u.created_at })) });
+  } catch (e) {
+    res.status(500).json({ error: 'Error listando usuarios', detail: e.message });
+  }
+});
+
+app.patch('/api/auth/users/:id/approve', authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const user = await approveUser(req.params.id);
+    res.json({ ok: true, user });
+  } catch (e) {
+    res.status(500).json({ error: 'Error aprobando usuario', detail: e.message });
+  }
+});
+
+app.patch('/api/auth/users/:id/reject', authenticateToken, authorizeAdmin, async (req, res) => {
+  try {
+    const user = await rejectUser(req.params.id);
+    res.json({ ok: true, user });
+  } catch (e) {
+    res.status(500).json({ error: 'Error rechazando usuario', detail: e.message });
+  }
 });
 
 // Versión / diagnóstico rápido
@@ -1069,7 +1152,13 @@ app.get('/detalle-productos/producto.html', (req,res)=>{
   res.sendFile(path.join(FRONT_DIR, 'detalle-productos', 'producto.html'));
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log('Backend escuchando en puerto', PORT);
-  console.log('Sirviendo frontend estático desde', FRONT_DIR);
+migrate().then(() => {
+  console.log('Base de datos migrada y usuario admin creado correctamente.');
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log('Backend escuchando en puerto', PORT);
+    console.log('Sirviendo frontend estático desde', FRONT_DIR);
+  });
+}).catch((e) => {
+  console.error('Error durante la migración de base de datos:', e);
+  process.exit(1);
 });
