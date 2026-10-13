@@ -12,6 +12,7 @@ import multer from 'multer';
 import sharp from 'sharp';
 import { migrate, createPendingUser, findUserByUsername, verifyUserPassword, listUsers, approveUser, rejectUser, findUserById } from './migrate.js';
 import { signToken, verifyToken, authenticateToken, authorizeAdmin } from './auth.js';
+import printRoutes from './print.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,8 +55,12 @@ async function readJSON(file) {
 }
 async function writeJSON(file, data) {
   await fs.writeFile(file, JSON.stringify(data, null, 2), 'utf8');
+
 }
 
+  app.use(printRoutes({ readJSON, writeJSON, ORDERS_FILE, logApp, requireAdmin }));
+
+  
 // GET productos (incluye merging con catálogo estático si existe)
 app.get('/api/products', async (req, res) => {
   try {
@@ -238,7 +243,8 @@ app.post('/api/orders', async (req, res) => {
       items: detalleItems,
       importe,
       paymentStatus: 'pending', // pending | approved | rejected | cancelled
-      externalReference: null
+      externalReference: null,
+      impreso : false
     };
     orders.push(nuevo);
 

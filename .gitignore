@@ -104,3 +104,9 @@ uploads/
 # Installers (avoid pushing large binaries)
 Git-*.exe
 GitHubDesktopSetup-*.exe
+
+print-agent/.env
+print-agent/node_modules
+node_modules
+*.db
+.env
