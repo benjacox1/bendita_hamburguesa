@@ -8,12 +8,14 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import os from 'os';
 import path from 'path';
+import { WebUSB } from 'usb';
 
 const run = promisify(exec);
 const { API_URL, PRINT_API_KEY, SERIAL_PORT, PRINTER_SHARE } = process.env;
 const TEST_MODE = process.env.TEST_MODE === '1';
 const W = Number(process.env.TICKET_WIDTH || 32);
 const headers = { 'x-api-key': PRINT_API_KEY };
+const VENDORS_ARDUINO = ['1A86', '2341', '2A03', '0403'];
 
 let pendientes = [];
 let imprimiendo = false;
@@ -82,7 +84,48 @@ function ticketEscPos(o) {
   ]);
 }
 
+async function detectarPuertoArduino() {
+  if (process.env.SERIAL_PORT) return process.env.SERIAL_PORT; // manual tiene prioridad
+  const puertos = await SerialPort.list();
+  const p = puertos.find(x => VENDORS_ARDUINO.includes((x.vendorId || '').toUpperCase()));
+  if (!p) throw new Error('No encontré el Arduino. Revisá el cable.');
+  console.log('[AGENTE] Arduino detectado en', p.path);
+  return p.path;
+}
+
 async function imprimirRaw(buf) {
+  if (process.env.PRINTER_VID) {
+    const vid = parseInt(process.env.PRINTER_VID, 16);
+    const pid = parseInt(process.env.PRINTER_PID, 16);
+    const webusb = new WebUSB({ allowAllDevices: true });
+    const devices = await webusb.getDevices();
+    const dev = devices.find(d => d.vendorId === vid && d.productId === pid);
+    if (!dev) throw new Error('Impresora USB no encontrada (revisá el cable y el driver)');
+
+    await dev.open();
+    try {
+      if (dev.configuration === null) await dev.selectConfiguration(1);
+      let ifaceNum = null;
+      let epNum = null;
+      for (const i of dev.configuration.interfaces) {
+        const ep = i.alternates[0].endpoints.find(e => e.direction === 'out' && e.type === 'bulk');
+        if (ep) { ifaceNum = i.interfaceNumber; epNum = ep.endpointNumber; break; }
+      }
+      if (ifaceNum === null) throw new Error('La impresora no tiene salida USB');
+
+      await dev.claimInterface(ifaceNum);
+      try {
+        const r = await dev.transferOut(epNum, buf);
+        if (r.status !== 'ok') throw new Error('Fallo al enviar: ' + r.status);
+      } finally {
+        await dev.releaseInterface(ifaceNum).catch(() => {});
+      }
+    } finally {
+      await dev.close().catch(() => {});
+    }
+    return;
+  }
+
   const tmp = path.join(os.tmpdir(), `ticket_${Date.now()}.bin`);
   await writeFile(tmp, buf);
   try {
@@ -146,9 +189,16 @@ if (TEST_MODE) {
   const rl = readline.createInterface({ input: process.stdin });
   rl.on('line', () => imprimirSiguiente());
 } else {
-  arduino = new SerialPort({ path: SERIAL_PORT, baudRate: 9600 });
+  let puerto;
+  try {
+    puerto = await detectarPuertoArduino();
+  } catch (e) {
+    console.error('[AGENTE]', e.message);
+    process.exit(1);
+  }
+  arduino = new SerialPort({ path: puerto, baudRate: 9600 });
   const parser = arduino.pipe(new ReadlineParser({ delimiter: '\n' }));
-  arduino.on('open', () => console.log('[AGENTE] Arduino conectado en', SERIAL_PORT));
+  arduino.on('open', () => console.log('[AGENTE] Arduino conectado en', puerto));
   arduino.on('error', e => console.error('[AGENTE] Error serie:', e.message));
   parser.on('data', l => {
     if (l.trim() === 'BTN') imprimirSiguiente();
