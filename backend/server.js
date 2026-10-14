@@ -9,7 +9,6 @@ import mercadopago, { MercadoPagoConfig, Preference } from 'mercadopago';
 import { logApp, logWebhook } from './logger.js';
 import { existsSync, createReadStream, mkdirSync } from 'fs';
 import multer from 'multer';
-import sharp from 'sharp';
 import { migrate, createPendingUser, findUserByUsername, verifyUserPassword, listUsers, approveUser, rejectUser, findUserById } from './migrate.js';
 import { signToken, verifyToken, authenticateToken, authorizeAdmin } from './auth.js';
 import printRoutes from './print.js';
@@ -1028,6 +1027,7 @@ app.post('/api/products/:id/image', requireAdmin, upload.single('imagen'), async
     await writeJSON(PRODUCTS_FILE, products);
     // Generar variantes .png, .webp y .avif junto a la original (negociación en /imagenes)
     try {
+      const { default: sharp } = await import('sharp');
       const src = path.join(IMAGES_DIR, fileName);
       await Promise.all([
         sharp(src).png().toFile(path.join(IMAGES_DIR, targetPng)).catch(()=>{}),
